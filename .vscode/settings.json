@@ -1,0 +1,8 @@
+{
+  "files.exclude": {
+    "**/build": true,
+    "**/temp": true,
+    ".ruff_cache": true,
+    ".mypy_cache": true,
+  }
+}

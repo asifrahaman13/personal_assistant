@@ -1,0 +1,71 @@
+[project]
+name = "telegram-analyzer"
+version = "0.1.0"
+description = "Telegram Group Message Analyzer"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+dependencies = [
+    "telethon>=1.34.0",
+    "python-dotenv>=1.0.0",
+    "textblob>=0.17.1",
+    "motor>=3.3.0",
+    "pymongo>=4.6.0",
+    "openai>=1.97.1",
+    "pre-commit>=4.2.0",
+    "mypy>=1.17.0",
+    "fastapi>=0.116.1",
+    "uvicorn[standard]>=0.35.0",
+    "pyjwt>=2.10.1",
+    "passlib[bcrypt]>=1.7.4",
+    "python-multipart>=0.0.20",
+    "bcrypt>=4.3.0",
+    "qdrant-client>=1.15.1",
+    "google-genai>=1.28.0",
+]
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+lint.select = ["I"]             # Only enable import sorting (isort rules)
+lint.ignore = []                
+lint.fixable = ["ALL"]          
+
+target-version = "py312"        
+line-length = 100               
+
+[tool.ruff.lint.isort]
+force-single-line = false        # Allow combining multiple imports on one line
+combine-as-imports = true        # Combine 'import x as y' when possible
+force-sort-within-sections = true  # Ensures sorted order within sections
+
+# Note: Ruff does NOT support `length_sort`, so it's excluded here.
+
+# -------------------------------
+# Mypy Configuration
+# -------------------------------
+[tool.mypy]
+ignore_missing_imports = false       # Report missing imports
+strict = false                       # Global strict mode off
+check_untyped_defs = false           # Don't check untyped functions
+disallow_untyped_calls = false       
+disallow_untyped_defs = false        
+disallow_incomplete_defs = false     
+warn_unused_ignores = true           
+ignore_errors = true                 # TEMP: Set to false when ready to fix errors
+
+# -------------------------------
+# isort Configuration (for line-length-based import sorting)
+# -------------------------------
+[tool.isort]
+line_length = 100
+length_sort = true                  # ✅ Sort imports by length (shortest to longest)
+combine_as_imports = true           # Combine 'import x as y'
+force_single_line = false           # Allow multiple imports on a single line
+force_sort_within_sections = true

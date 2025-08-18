@@ -1,0 +1,43 @@
+name: web CI/CD
+on:
+  workflow_dispatch:
+
+  push:
+
+jobs:
+  build:
+    name: Build web
+    runs-on: ubuntu-latest
+    env:
+      ORG_PROJECT: super-query
+      DEPLOY_ENV: dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          echo 'export BUN_INSTALL="$HOME/.bun"' >> $GITHUB_ENV
+          echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> $GITHUB_ENV
+      - name: Setup Bun environment variables
+        run: |
+          echo "BUN_INSTALL=$HOME/.bun" >> $GITHUB_ENV
+          echo "PATH=$HOME/.bun/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          cd web
+          bun install
+
+      - name: Lint the codebase
+        run: |
+          cd web
+          bun run lint
+
+      - name: Build
+        run: |
+          cd web
+          bun run build

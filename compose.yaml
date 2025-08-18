@@ -1,0 +1,43 @@
+services:
+  mongodb:
+    image: "mongo:latest"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - my-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - my-network
+    env_file:
+      - .env
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - my-network
+    depends_on:
+      - backend
+      - mongodb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
