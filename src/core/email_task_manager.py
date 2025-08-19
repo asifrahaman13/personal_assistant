@@ -1,16 +1,17 @@
 import asyncio
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional, List
-import hashlib
 import email
-import email.policy
 from email.mime.text import MIMEText
-import aiosmtplib
-import aioimaplib
+import email.policy
+import hashlib
+from typing import Any, Dict, List, Optional
 
+import aioimaplib
+import aiosmtplib
+
+from src.core.intelligent_response import IntelligentResponseHandler
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
-from src.core.intelligent_response import IntelligentResponseHandler
 
 
 class EmailClient:
@@ -37,9 +38,7 @@ class EmailClient:
             start_tls=True,
         )
 
-    async def fetch_emails(
-        self, folder="INBOX", search_criteria="ALL", limit=10
-    ) -> List[Dict]:
+    async def fetch_emails(self, folder="INBOX", search_criteria="ALL", limit=10) -> List[Dict]:
         """Fetch emails asynchronously using aioimaplib"""
         client = aioimaplib.IMAP4_SSL(host=self.imap_server, port=self.imap_port)
         await client.wait_hello_from_server()
@@ -74,13 +73,10 @@ class EmailClient:
 
             if msg.is_multipart():
                 for part in msg.walk():
-                    if (
-                        part.get_content_type() == "text/plain"
-                        and not part.get_filename()
-                    ):
+                    if part.get_content_type() == "text/plain" and not part.get_filename():
                         payload = part.get_payload(decode=True)
                         if payload:
-                            body = payload.decode( # type: ignore
+                            body = payload.decode(  # type: ignore
                                 part.get_content_charset() or "utf-8",
                                 errors="ignore",
                             ).strip()
@@ -88,13 +84,11 @@ class EmailClient:
             else:
                 payload = msg.get_payload(decode=True)
                 if payload:
-                    body = payload.decode( # type: ignore
+                    body = payload.decode(  # type: ignore
                         msg.get_content_charset() or "utf-8", errors="ignore"
                     ).strip()
 
-            unique_key = hashlib.sha256(
-                f"{from_}{subject}{body}".encode()
-            ).hexdigest()
+            unique_key = hashlib.sha256(f"{from_}{subject}{body}".encode()).hexdigest()
 
             emails.append(
                 {
@@ -115,7 +109,7 @@ class EmailTaskManager:
         self.active_tasks: Dict[str, asyncio.Task] = {}
         self.mongo_manager = MongoDBManager()
         self.client_cache: Dict[str, EmailClient] = {}
-        self.check_interval= 10
+        self.check_interval = 10
 
     async def start_email_task(
         self,
@@ -168,8 +162,6 @@ class EmailTaskManager:
             logger.error(f"Error starting email task: {str(e)}")
             return {"success": False, "message": f"Failed to start email task: {str(e)}"}
 
-
-
     async def _run_email_task(self, organization_id: str, email_client, filters: list):
         intelligent_response_handler = IntelligentResponseHandler()
         try:
@@ -177,7 +169,7 @@ class EmailTaskManager:
             while True:
                 # ✅ Restrict to today's unseen emails
                 today = datetime.now().strftime("%d-%b-%Y")  # e.g., "19-Aug-2025"
-                search_criteria = f'(UNSEEN SINCE {today})'
+                search_criteria = f"(UNSEEN SINCE {today})"
 
                 logger.info("Fetching today's emails")
                 emails = await email_client.fetch_emails(search_criteria=search_criteria, limit=10)
@@ -187,22 +179,22 @@ class EmailTaskManager:
                     logger.info(f"Fetched email: {mail.get('subject')} from {mail.get('from')}")
 
                     llm_responses = await intelligent_response_handler.handle_message(
-                        mail.get('body', ''),
-                        recent_messages=None,  
+                        mail.get("body", ""),
+                        recent_messages=None,
                         current_message={
-                            "text": mail.get('body', ''),
-                            "subject": mail.get('subject', ''),
-                            "from": mail.get('from', '')
+                            "text": mail.get("body", ""),
+                            "subject": mail.get("subject", ""),
+                            "from": mail.get("from", ""),
                         },
-                        search_results=None
+                        search_results=None,
                     )
 
                     reply_text = llm_responses[0] if llm_responses else "Thank you for your email."
 
                     await email_client.send_email(
-                        to_address=mail.get('from'),
+                        to_address=mail.get("from"),
                         subject=f"Re: {mail.get('subject')}",
-                        body=reply_text
+                        body=reply_text,
                     )
                     logger.info(f"Sent LLM reply to {mail.get('from')}")
 
@@ -246,8 +238,6 @@ class EmailTaskManager:
         except Exception as e:
             logger.error(f"Error stopping email task: {str(e)}")
             return {"success": False, "message": f"Failed to stop email task: {str(e)}"}
-
-
 
     async def get_active_tasks(self) -> Dict[str, Any]:
         active_tasks = {}
@@ -299,5 +289,6 @@ class EmailTaskManager:
             "message": f"Stopped {len(results)} email tasks",
             "results": results,
         }
+
 
 email_task_manager = EmailTaskManager()

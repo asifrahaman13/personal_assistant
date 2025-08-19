@@ -10,11 +10,14 @@ from src.models.email_models import (
     EmailTaskStatusResponse,
 )
 
+
 class EmailTasksController:
     def __init__(self):
         self.mongo_manager = MongoDBManager()
 
-    async def start_email_task(self, request: EmailTaskRequest, current_org: dict) -> EmailTaskResponse:
+    async def start_email_task(
+        self, request: EmailTaskRequest, current_org: dict
+    ) -> EmailTaskResponse:
         try:
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
@@ -28,7 +31,7 @@ class EmailTasksController:
                 organization_id=organization_id,
                 email_address=organization.get("email", ""),
                 filters=request.filters,
-                app_password=organization.get("app_password", "")
+                app_password=organization.get("app_password", ""),
             )
 
             if not result["success"]:
@@ -45,9 +48,7 @@ class EmailTasksController:
             raise
         except Exception as e:
             logger.error(f"Error starting email task: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Failed to start email task: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Failed to start email task: {str(e)}")
 
     async def stop_email_task(self, current_org: dict) -> EmailTaskResponse:
         try:
@@ -86,7 +87,7 @@ class EmailTasksController:
             result = await email_task_manager.get_task_status(organization_id)
 
             if not result["success"]:
-                return EmailTaskStatusResponse(success=False, message=result["message"]) # type: ignore
+                return EmailTaskStatusResponse(success=False, message=result["message"])  # type: ignore
 
             return EmailTaskStatusResponse(
                 success=True,
@@ -124,9 +125,7 @@ class EmailTasksController:
             raise
         except Exception as e:
             logger.error(f"Error listing email tasks: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Failed to list email tasks: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Failed to list email tasks: {str(e)}")
 
     async def stop_all_email_tasks(self, current_org: dict) -> dict:
         try:
@@ -143,6 +142,4 @@ class EmailTasksController:
             raise
         except Exception as e:
             logger.error(f"Error stopping all email tasks: {str(e)}")
-            raise HTTPException(
-                status_code=500, detail=f"Failed to stop all email tasks: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Failed to stop all email tasks: {str(e)}")

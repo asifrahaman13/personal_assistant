@@ -22,7 +22,7 @@ class OrganizationCreate(BaseModel):
     name: str = Field(..., description="Organization name")
     api_id: str = Field(..., description="Telegram API ID")
     api_hash: str = Field(..., description="Telegram API Hash")
-    app_password: str  = Field(..., description="Google app password")
+    app_password: str = Field(..., description="Google app password")
     phone: str = Field(..., description="Phone number in international format")
 
 

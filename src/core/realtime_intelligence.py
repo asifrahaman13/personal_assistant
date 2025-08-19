@@ -9,7 +9,7 @@ from src.config.config import config
 from src.core.intelligent_response import IntelligentResponseHandler
 from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
-from src.llm import  LLMManager
+from src.llm import LLMManager
 from src.logs.logs import logger
 
 

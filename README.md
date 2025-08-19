@@ -1,6 +1,6 @@
 # Telegram Group Analyzer - Production Ready
 
-A production-ready Telegram group message analyzer with MongoDB storage, sentiment analysis, and user activity tracking.
+A production-ready Personalized assistant.
 
 
 <img width="1905" height="964" alt="Screenshot from 2025-07-30 10-22-32" src="https://github.com/user-attachments/assets/8ad73723-b3ba-4c6a-9bc8-a98469648925" />
@@ -24,7 +24,6 @@ A production-ready Telegram group message analyzer with MongoDB storage, sentime
 ## 📊 Analysis Features
 
 - **Unique User Tracking**: Count and analyze unique users in groups
-- **Sentiment Analysis**: Analyze message sentiment (positive/negative/neutral)
 - **User Activity**: Track most active users
 - **Message Statistics**: Comprehensive message analytics
 - **Chunked Processing**: Efficient handling of large message volumes with configurable chunk sizes

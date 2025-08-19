@@ -9,7 +9,7 @@ from telethon.sessions import StringSession
 from telethon.tl.types import Channel, Chat, PeerChannel, PeerChat
 
 from src.db.mongodb import MongoDBManager
-from src.llm import  LLMManager
+from src.llm import LLMManager
 from src.logs.logs import logger
 
 
