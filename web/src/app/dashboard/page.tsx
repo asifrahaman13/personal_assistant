@@ -46,7 +46,7 @@ export default function Dashboard() {
         setLoading(false);
       } catch (err) {
         console.error('Failed to fetch groups:', err);
-        router.push('/');
+        router.push('/organization');
       }
     };
     fetchGroups();

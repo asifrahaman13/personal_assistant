@@ -11,7 +11,13 @@ export default function OrganizationAuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState<string | null>(null);
-  const [orgForm, setOrgForm] = useState({ name: '', api_id: '', api_hash: '', phone: '' });
+  const [orgForm, setOrgForm] = useState({
+    name: '',
+    api_id: '',
+    api_hash: '',
+    app_password: '',
+    phone: '',
+  });
   const [orgId, setOrgId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -158,6 +164,19 @@ export default function OrganizationAuthPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  GOOGLE APP PASSWORD
+                </label>
+                <input
+                  name="app_password"
+                  placeholder="Enter your Google app password"
+                  value={orgForm.app_password}
+                  onChange={handleOrgForm}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                 <input
