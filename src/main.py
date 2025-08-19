@@ -4,15 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.routers import (
     auth_router,
     background_tasks_router,
+    email_tasks_router,
     organization_router,
     telegram_data_router,
-    email_tasks_router,
 )
-
 
 app = FastAPI(
     title="Personal Assistant API",
-    description="API for Telegram group analysis and real-time message handling",
+    description="API for Personal assistant and real-time message handling",
     version="1.0.0",
 )
 
