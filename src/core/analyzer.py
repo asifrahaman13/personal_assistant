@@ -1096,7 +1096,6 @@ class ProductionTelegramAnalyzer:
                 logger.error("Please enter a valid number.")
 
     async def _get_group_metadata(self, group_id: int) -> Dict:
-        """Get group metadata from the groups collection"""
         try:
             group_info = await self.mongo_manager.find_one(
                 "groups",

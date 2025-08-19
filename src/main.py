@@ -1,9 +1,6 @@
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import uvicorn
 
 from src.routers import (
     auth_router,
@@ -42,13 +39,3 @@ async def root():
 @app.get("/health")
 async def health_check():
     return JSONResponse(content={"status": "healthy"})
-
-
-async def main():
-    config = uvicorn.Config(app=app, host="127.0.0.1", port=8000, reload=True)
-    server = uvicorn.Server(config)
-    await server.serve()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
