@@ -1,6 +1,6 @@
-## AI BASED PERSONAL ASSISTANT
+## AI POWERED SECOND BRAIN
 
-A production-ready Personalized assistant.
+A production-ready Personalized AI Powered second brain assistant.
 
 ## 🚀 Production Features
 

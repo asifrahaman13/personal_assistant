@@ -18,9 +18,7 @@ class BackgroundTasksController:
     async def start_background_task(
         self, request: BackgroundTaskRequest, current_org: dict
     ) -> BackgroundTaskResponse:
-        """Start a background task for real-time intelligence monitoring"""
         try:
-            # Get organization ID
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
@@ -29,7 +27,6 @@ class BackgroundTasksController:
 
             organization_id = organization["id"]
 
-            # Start the background task
             result = await background_task_manager.start_intelligence_task(
                 organization_id=organization_id, group_ids=request.group_ids
             )
@@ -54,9 +51,7 @@ class BackgroundTasksController:
             )
 
     async def stop_background_task(self, current_org: dict) -> BackgroundTaskResponse:
-        """Stop the background task for the current organization"""
         try:
-            # Get organization ID
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
@@ -65,7 +60,6 @@ class BackgroundTasksController:
 
             organization_id = organization["id"]
 
-            # Stop the background task
             result = await background_task_manager.stop_intelligence_task(organization_id)
 
             if not result["success"]:
@@ -82,9 +76,7 @@ class BackgroundTasksController:
             raise HTTPException(status_code=500, detail=f"Failed to stop background task: {str(e)}")
 
     async def get_background_task_status(self, current_org: dict) -> BackgroundTaskStatusResponse:
-        """Get the status of the background task for the current organization"""
         try:
-            # Get organization ID
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
@@ -93,7 +85,6 @@ class BackgroundTasksController:
 
             organization_id = organization["id"]
 
-            # Get task status
             result = await background_task_manager.get_task_status(organization_id)
 
             if not result["success"]:
@@ -118,16 +109,13 @@ class BackgroundTasksController:
             )
 
     async def list_background_tasks(self, current_org: dict) -> BackgroundTasksListResponse:
-        """Get information about all active background tasks (admin only)"""
         try:
-            # Get organization ID
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
             if not organization:
                 raise HTTPException(status_code=404, detail="Organization not found")
 
-            # Get all active tasks
             result = await background_task_manager.get_active_tasks()
 
             return BackgroundTasksListResponse(
@@ -145,16 +133,13 @@ class BackgroundTasksController:
             )
 
     async def stop_all_background_tasks(self, current_org: dict) -> dict:
-        """Stop all active background tasks (admin only)"""
         try:
-            # Get organization ID
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
             if not organization:
                 raise HTTPException(status_code=404, detail="Organization not found")
 
-            # Stop all tasks
             result = await background_task_manager.stop_all_tasks()
 
             return {"success": True, "message": result["message"], "results": result["results"]}

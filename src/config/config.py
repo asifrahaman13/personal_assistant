@@ -38,7 +38,6 @@ class Config:
         default_factory=lambda: require_int_env("MAX_MESSAGES_PER_REQUEST", default=100)
     )
     OPENAI_API_KEY: str = field(default_factory=lambda: require_env("OPENAI_API_KEY"))
-    GEMINI_API_KEY: str = field(default_factory=lambda: require_env("GEMINI_API_KEY"))
     DB_NAME: str = field(default_factory=lambda: require_env("DB_NAME"))
     JWT_SECRET_KEY: str = field(default_factory=lambda: require_env("JWT_SECRET_KEY"))
     QDRANT_API_URL: str = field(default_factory=lambda: require_env("QDRANT_API_URL"))

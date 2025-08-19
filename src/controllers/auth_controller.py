@@ -28,7 +28,6 @@ class AuthController:
         self.pending_sessions: Dict[str, ProductionTelegramAnalyzer] = {}
 
     async def signup_organization(self, org_data: OrganizationSignupRequest) -> Token:
-        """Handle organization signup"""
         existing = await self.mongo_manager.find_one("organizations", {"email": org_data.email})
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
@@ -46,7 +45,6 @@ class AuthController:
         return Token(access_token=access_token, token_type="bearer")
 
     async def login_organization(self, form_data: OrganizationLoginRequest) -> Token:
-        """Handle organization login"""
         logger.info(f"The form_data is {form_data}")
         org = await self.mongo_manager.find_one("organizations", {"email": form_data.email})
         if not org or not verify_password(form_data.password, org["password_hash"]):
@@ -56,7 +54,6 @@ class AuthController:
         return Token(access_token=access_token, token_type="bearer", phone=org["phone"])
 
     async def telegram_login(self, form_data: dict, current_org: dict) -> LoginResponse:
-        """Handle Telegram login"""
         logger.info(f"The form_data is {form_data} {current_org}")
         org = await self.mongo_manager.find_one("organizations", {"email": current_org["email"]})
         if not org:
@@ -77,7 +74,6 @@ class AuthController:
         )
 
     async def verify_code(self, request: CodeRequest, current_org: dict) -> CodeResponse:
-        """Handle code verification"""
         try:
             logger.info(f"The request is {request}")
             logger.info(f"The current_org is {current_org}")
@@ -159,7 +155,6 @@ class AuthController:
             raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     async def logout(self, organization_id: str, phone: str) -> dict:
-        """Handle logout"""
         try:
             result = await self.mongo_manager.delete_one(
                 "sessions", {"organization_id": organization_id, "phone": phone}

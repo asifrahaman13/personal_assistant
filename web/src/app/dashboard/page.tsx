@@ -229,46 +229,6 @@ export default function Dashboard() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {/* Welcome Card */}
-            {/* <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {selectedGroup ? selectedGroup.title : 'Welcome!'}
-                  </h2>
-                  <p className="text-gray-600">
-                    {selectedGroup
-                      ? `Group ID: ${selectedGroup.id}`
-                      : 'You are successfully authenticated'}
-                  </p>
-                </div>
-              </div>
-              <p className="text-gray-700">
-                {selectedGroup
-                  ? `Username: ${selectedGroup.username || 'N/A'}, Participants: ${selectedGroup.participants_count}`
-                  : 'Your Telegram account is connected and ready for analysis.'}
-              </p>
-            </motion.div> */}
 
             {/* Quick Actions */}
             <motion.div
@@ -280,7 +240,7 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
 
-                {bgTaskStatus && (
+                {bgTaskStatus===null?  <span className="text-gray-500 text-sm italic">no event</span> : (
                   <span
                     className={`
         px-3 py-1 rounded-full text-sm font-medium
@@ -457,7 +417,6 @@ export default function Dashboard() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {/* Welcome Card */}
 
             {/* Quick Actions */}
             <motion.div
