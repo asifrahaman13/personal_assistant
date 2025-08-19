@@ -21,7 +21,6 @@ class OrganizationController:
     async def create_organization(
         self, org_data: OrganizationCreate, current_org: dict
     ) -> OrganizationResponse:
-        """Create a new organization"""
         try:
             logger.info(f"The org_data is {org_data}")
             existing_org = await self.mongo_manager.find_one(
@@ -65,7 +64,6 @@ class OrganizationController:
             raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     async def list_organizations(self) -> List[Organization]:
-        """List all organizations"""
         try:
             organizations = await self.mongo_manager.find_many("organizations")
             return [Organization(**org) for org in organizations]
@@ -77,7 +75,6 @@ class OrganizationController:
             raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     async def get_organization(self, org_id: str) -> Organization:
-        """Get a specific organization by ID"""
         try:
             org = await self.mongo_manager.find_one("organizations", {"id": org_id})
             if not org:
@@ -94,7 +91,6 @@ class OrganizationController:
     async def update_organization(
         self, org_id: str, org_data: OrganizationUpdate
     ) -> OrganizationResponse:
-        """Update an organization"""
         try:
             existing_org = await self.mongo_manager.find_one("organizations", {"id": org_id})
             if not existing_org:
@@ -127,7 +123,6 @@ class OrganizationController:
             raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     async def check_organization_setup(self, current_org: dict) -> dict:
-        """Check if organization is properly set up"""
         try:
             org = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
@@ -149,7 +144,6 @@ class OrganizationController:
             raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
     async def delete_organization(self, org_id: str) -> OrganizationResponse:
-        """Delete an organization and all related data"""
         try:
             if not await self.mongo_manager.setup():
                 raise HTTPException(status_code=500, detail="Failed to setup database connection")
@@ -162,7 +156,6 @@ class OrganizationController:
             await self.mongo_manager.delete_many("sessions", {"organization_id": org_id})
             await self.mongo_manager.delete_many("groups", {"organization_id": org_id})
             await self.mongo_manager.delete_many("messages", {"organization_id": org_id})
-            # await self.mongo_manager.delete_many("analyses", {"organization_id": org_id})
             await self.mongo_manager.delete_many("auth_sessions", {"organization_id": org_id})
 
             logger.info(f"Deleted organization: {org_id}")

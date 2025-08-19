@@ -31,12 +31,12 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-             AI Based 
+              AI Based
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {' '}
                 Personal{' '}
               </span>
-              Assistant 
+              Assistant
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">

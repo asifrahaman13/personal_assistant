@@ -6,19 +6,8 @@ import axios from 'axios';
 import { backend_url } from '@/config/config';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import LoadingDashboard from '@/components/LoadingDashboard';
-
-interface Group {
-  id: number;
-  title: string;
-  username?: string;
-  participants_count: number;
-}
 
 export default function Dashboard() {
-  const [loading, setLoading] = useState(true);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 30);
@@ -29,33 +18,9 @@ export default function Dashboard() {
   const [bgTaskStatus, setBgTaskStatus] = useState<string | null>(null);
   const [bgTaskLoading, setBgTaskLoading] = useState(false);
   const [bgTaskError, setBgTaskError] = useState('');
-
   const [bgEmTaskStatus, setBgEmTaskStatus] = useState<string | null>(null);
   const [bgEmTaskLoading, setBgEmTaskLoading] = useState(false);
   const [bgEmTaskError, setBgEmTaskError] = useState('');
-
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const phone = localStorage.getItem('telegram_phone');
-        const token = localStorage.getItem('org_jwt');
-        const res = await axios.post(
-          `${backend_url}/api/v1/groups`,
-          {
-            phone,
-          },
-          token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
-        );
-        setGroups(res.data.groups);
-        setSelectedGroup(res.data.groups[0] || null);
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch groups:', err);
-        router.push('/organization');
-      }
-    };
-    fetchGroups();
-  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -145,6 +110,7 @@ export default function Dashboard() {
   };
 
   const fetchEmStatus = async () => {
+    console.log('Called the function');
     try {
       const token = localStorage.getItem('org_jwt');
       const response = await axios.get(`${backend_url}/api/v1/email-tasks/status`, {
@@ -180,20 +146,21 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchTgStatus();
     fetchEmStatus();
-
+    fetchTgStatus();
+    const fetchStatusAsync = async () => {
+      try {
+        Promise.all([fetchEmStatus(), fetchTgStatus()]);
+      } catch {
+        console.error('Sorry unable to update the status update.');
+      }
+    };
     const interval = setInterval(() => {
-      fetchTgStatus();
-      fetchEmStatus();
+      fetchStatusAsync();
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
-
-  if (loading) {
-    return <LoadingDashboard />;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -263,7 +230,7 @@ export default function Dashboard() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {/* Welcome Card */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -301,7 +268,7 @@ export default function Dashboard() {
                   ? `Username: ${selectedGroup.username || 'N/A'}, Participants: ${selectedGroup.participants_count}`
                   : 'Your Telegram account is connected and ready for analysis.'}
               </p>
-            </motion.div>
+            </motion.div> */}
 
             {/* Quick Actions */}
             <motion.div
@@ -362,7 +329,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 cursor-pointer"
-                  disabled={bgTaskLoading || !selectedGroup}
+                  disabled={bgTaskLoading}
                   onClick={startBackgroundTask}
                 >
                   {bgTaskLoading ? (
@@ -466,27 +433,13 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Statistics</h2>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-                  <span className="text-gray-600">Connected Groups</span>
-                  <span className="text-2xl font-bold text-blue-600">{groups.length}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-xl">
-                  <span className="text-gray-600">Participants</span>
-                  <span className="text-2xl font-bold text-green-600">
-                    {selectedGroup ? selectedGroup.participants_count : 0}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-xl">
-                  <span className="text-gray-600">Username</span>
-                  <span className="text-sm text-gray-500">
-                    {selectedGroup ? selectedGroup.username || 'N/A' : 'N/A'}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
+            ></motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
+            ></motion.div>
           </motion.div>
         </main>
       </div>
@@ -505,45 +458,6 @@ export default function Dashboard() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {/* Welcome Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {selectedGroup ? selectedGroup.title : 'Welcome!'}
-                  </h2>
-                  <p className="text-gray-600">
-                    {selectedGroup
-                      ? `Group ID: ${selectedGroup.id}`
-                      : 'You are successfully authenticated'}
-                  </p>
-                </div>
-              </div>
-              <p className="text-gray-700">
-                {selectedGroup
-                  ? `Username: ${selectedGroup.username || 'N/A'}, Participants: ${selectedGroup.participants_count}`
-                  : 'Your Telegram account is connected and ready for analysis.'}
-              </p>
-            </motion.div>
 
             {/* Quick Actions */}
             <motion.div
@@ -710,27 +624,13 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Statistics</h2>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-                  <span className="text-gray-600">Connected Groups</span>
-                  <span className="text-2xl font-bold text-blue-600">{groups.length}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-xl">
-                  <span className="text-gray-600">Participants</span>
-                  <span className="text-2xl font-bold text-green-600">
-                    {selectedGroup ? selectedGroup.participants_count : 0}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-xl">
-                  <span className="text-gray-600">Username</span>
-                  <span className="text-sm text-gray-500">
-                    {selectedGroup ? selectedGroup.username || 'N/A' : 'N/A'}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
+            ></motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
+            ></motion.div>
           </motion.div>
         </main>
       </div>

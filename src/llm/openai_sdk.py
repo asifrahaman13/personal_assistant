@@ -1,17 +1,9 @@
 from enum import Enum
-import json
-from typing import Tuple
 
 import openai
 
 from src.config.config import config
 from src.logs.logs import logger
-
-
-class Sentiment(Enum):
-    POSITIVE = "positive"
-    NEGATIVE = "negative"
-    NEUTRAL = "neutral"
 
 
 class Model(Enum):
@@ -27,66 +19,9 @@ class LLMManager:
 
         openai.api_key = self.api_key
         self.client = openai.AsyncOpenAI(api_key=self.api_key)
-
-    async def analyze_sentiment(self, text: str) -> Tuple[str, float]:
-        try:
-            if not self.client:
-                logger.error("OpenAI client not initialized")
-                return Sentiment.NEUTRAL.value, 0.0
-
-            prompt = f"""
-            Analyze the sentiment of the following text and respond with ONLY a JSON object containing:
-            - "sentiment": "positive", "negative", or "neutral"
-            - "confidence": a number between 0 and 1
-            
-            Text: "{text}"
-            """
-
-            response = await self.client.chat.completions.create(
-                model=Model.GPT_4_1.value,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a sentiment analysis expert. Respond only with valid JSON.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=100,
-                temperature=0.1,
-            )
-
-            result = (
-                response.choices[0].message.content.strip()
-                if response.choices[0].message.content
-                else ""
-            )
-
-            logger.info(f"Result: {result}")
-
-            try:
-                sentiment_data = json.loads(result)
-                sentiment = sentiment_data.get("sentiment", "neutral")
-                confidence = sentiment_data.get("confidence", 0.5)
-
-                if sentiment == Sentiment.POSITIVE.value:
-                    polarity = confidence
-                elif sentiment == Sentiment.NEGATIVE.value:
-                    polarity = -confidence
-                else:
-                    polarity = 0.0
-
-                logger.debug(
-                    f"LLM Sentiment: {sentiment} (confidence: {confidence:.2f}, polarity: {polarity:.2f})"
-                )
-                return sentiment, polarity
-
-            except json.JSONDecodeError:
-                logger.warning(f"Failed to parse LLM response: {result}")
-                return Sentiment.NEUTRAL.value, 0.0
-
-        except Exception as e:
-            logger.error(f"Error in LLM sentiment analysis: {str(e)}")
-            return Sentiment.NEUTRAL.value, 0.0
+        self.max_tokens = 500
+        self.top_p = 0.1
+        self.temperature = 0.1
 
     async def generate_response(
         self,
@@ -110,12 +45,35 @@ class LLMManager:
                 messages=[
                     {
                         "role": "system",
-                        "content": f"Your task is to give a proper and valid response to the message. You are a helpful assistant. You  have some context which you can use as knowledge base for better response. \n===============\n Context: {search_results} \n===============\n Recent messages: {recent_messages}",
+                        "content": f"""Your task is to give a proper and valid response to the message. You are a helpful assistant. You  have some context which you can use as knowledge base for better response. 
+                        Format your response using HTML tags that Telegram supports. Remember it should be a valid HTML code ready to be parsed by Telegram.
+                        - Use <b>text</b> for bold text
+                        - Use <i>text</i> for italic text
+                        - Use <code>text</code> for monospace/code text
+                        - Use <pre>text</pre> for preformatted text
+                        - Use <u>text</u> for underlined text
+                        - Use <s>text</s> for strikethrough text
+                        - Use <a href="url">text</a> for hyperlinks
+                        
+                        Guidelines:
+                        - Do not escape characters like \n, \t, etc. Use the HTML tags instead.
+                        - Answer concisely and to the point
+                        - Use bullet points when appropriate
+                        - Highlight important terms with bold/italic formatting
+                        - Make responses human-readable with proper spacing and formatting
+                        - Use the provided context to give relevant answers
+                        - If context is not present then provide your own answer.
+                        - Ensure all HTML tags are properly closed
+                        - Use <br> for line breaks instead of \n
+                        - Avoid using \n or \t in the response, use HTML tags instead
+                        
+                        \n===============\n Context: {search_results} \n===============\n Recent messages: {recent_messages}""",
                     },
                     {"role": "user", "content": prompt},
                 ],
-                max_tokens=100,
-                temperature=0.1,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
             )
 
             result = (

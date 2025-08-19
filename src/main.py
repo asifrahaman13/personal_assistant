@@ -1,12 +1,15 @@
+import asyncio
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import uvicorn
 
 from src.routers import (
     auth_router,
     background_tasks_router,
     email_tasks_router,
     organization_router,
-    telegram_data_router,
 )
 
 app = FastAPI(
@@ -25,7 +28,6 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/api/v1", tags=["Authentication"])
 app.include_router(organization_router, prefix="/api/v1", tags=["Organizations"])
-app.include_router(telegram_data_router, prefix="/api/v1", tags=["Telegram Data"])
 app.include_router(
     background_tasks_router, prefix="/api/v1/background-tasks", tags=["Background Tasks"]
 )
@@ -34,9 +36,19 @@ app.include_router(email_tasks_router, prefix="/api/v1/email-tasks", tags=["Emai
 
 @app.get("/")
 async def root():
-    return {"message": "Personal Assistant API is running"}
+    return JSONResponse(content={"message": "Personal Assistant API is running"})
 
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return JSONResponse(content={"status": "healthy"})
+
+
+async def main():
+    config = uvicorn.Config(app=app, host="127.0.0.1", port=8000, reload=True)
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

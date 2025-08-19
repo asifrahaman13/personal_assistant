@@ -24,7 +24,7 @@ class EmailClient:
         self.imap_port = 993
 
     async def send_email(self, to_address: str, subject: str, body: str):
-        msg = MIMEText(body)
+        msg = MIMEText(body, "html")
         msg["Subject"] = subject
         msg["From"] = self.email_address
         msg["To"] = to_address
@@ -39,7 +39,6 @@ class EmailClient:
         )
 
     async def fetch_emails(self, folder="INBOX", search_criteria="ALL", limit=10) -> List[Dict]:
-        """Fetch emails asynchronously using aioimaplib"""
         client = aioimaplib.IMAP4_SSL(host=self.imap_server, port=self.imap_port)
         await client.wait_hello_from_server()
 
