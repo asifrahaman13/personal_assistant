@@ -43,6 +43,7 @@ class Config:
     JWT_SECRET_KEY: str = field(default_factory=lambda: require_env("JWT_SECRET_KEY"))
     QDRANT_API_URL: str = field(default_factory=lambda: require_env("QDRANT_API_URL"))
     QDRANT_API_KEY: str = field(default_factory=lambda: require_env("QDRANT_API_KEY"))
+    EMAIL_APP_PASSWORD: str = field(default_factory=lambda: require_env("EMAIL_PASSWORD"))
 
 
 config = Config()

@@ -11,7 +11,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg"></div>
-            <span className="text-xl font-semibold text-gray-900">Telegram Analyzer</span>
+            <span className="text-xl font-semibold text-gray-900">Personal Assistant</span>
           </div>
           <Link
             href="/organization"

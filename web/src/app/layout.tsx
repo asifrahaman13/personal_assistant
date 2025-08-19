@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Telegram Analyzer',
-  description: 'Telegram Analyzer',
+  title: 'Personal Assistant',
+  description: 'Personal Assistant',
   icons: {
     icon: '/logo.png',
   },

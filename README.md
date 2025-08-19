@@ -80,7 +80,7 @@ docker-compose up -d
 
 This will start:
 - MongoDB database
-- Telegram Analyzer application
+- Personal Assistant application
 
 ### 3. Local Development
 

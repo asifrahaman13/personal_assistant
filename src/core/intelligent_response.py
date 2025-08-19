@@ -34,7 +34,7 @@ class IntelligentResponseHandler:
             self.llm_manager.generate_response(
                 response, search_results_string, recent_messages_string
             )
-            for _ in range(3)
+            for _ in range(1)
         ]
 
         intelligent_responses = await asyncio.gather(*tasks)

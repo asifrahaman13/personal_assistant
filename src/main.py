@@ -1,13 +1,17 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.routers.auth_router import auth_router
-from src.routers.background_tasks import background_tasks_router
-from src.routers.organization_router import organization_router
-from src.routers.telegram_data import telegram_data_router
+from src.routers import (
+    auth_router,
+    background_tasks_router,
+    organization_router,
+    telegram_data_router,
+    email_tasks_router,
+)
+
 
 app = FastAPI(
-    title="Telegram Analyzer API",
+    title="Personal Assistant API",
     description="API for Telegram group analysis and real-time message handling",
     version="1.0.0",
 )
@@ -26,11 +30,12 @@ app.include_router(telegram_data_router, prefix="/api/v1", tags=["Telegram Data"
 app.include_router(
     background_tasks_router, prefix="/api/v1/background-tasks", tags=["Background Tasks"]
 )
+app.include_router(email_tasks_router, prefix="/api/v1/email-tasks", tags=["Email Tasks"])
 
 
 @app.get("/")
 async def root():
-    return {"message": "Telegram Analyzer API is running"}
+    return {"message": "Personal Assistant API is running"}
 
 
 @app.get("/health")

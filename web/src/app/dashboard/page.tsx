@@ -174,7 +174,7 @@ export default function Dashboard() {
               </Link>
               <div>
                 <Link href="/" className="text-2xl font-bold text-gray-900">
-                  Telegram Analyzer
+                  Personal Assistant
                 </Link>
                 <p className="text-gray-600">Dashboard</p>
               </div>
