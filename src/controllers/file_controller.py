@@ -72,6 +72,8 @@ class FileController:
 
             if file_type == "image":
                 file_path = self.upload_image_dir / f"{file_name}"
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(file.file, buffer)
 
                 sample_metadata = [
                     {

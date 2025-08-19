@@ -169,7 +169,7 @@ class EmailTaskManager:
             logger.error(f"Error starting email task: {str(e)}")
             return {"success": False, "message": f"Failed to start email task: {str(e)}"}
 
-    async def _run_email_task(self, organization_id: str, email_client, filters: list):
+    async def _run_email_task(self, organization_id: str, email_client: EmailClient, filters: list):
         intelligent_response_handler = IntelligentResponseHandler()
         try:
             logger.info(f"Running email task for organization {organization_id}")
@@ -203,7 +203,7 @@ class EmailTaskManager:
                     reply_text = llm_responses[0] if llm_responses else "Thank you for your email."
 
                     await email_client.send_email(
-                        to_address=mail.get("from"),
+                        to_address=mail.get("from"),  # type: ignore
                         subject=f"Re: {mail.get('subject')}",
                         body=reply_text,
                     )

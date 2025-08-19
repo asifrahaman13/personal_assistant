@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -529,14 +529,45 @@ class RealTimeIntelligenceHandler:
             logger.error(f"Error fetching recent messages: {str(e)}")
             return []
 
-    async def send_intelligent_response(self, chat_id: int, response_text: str) -> bool:
+    # async def send_intelligent_response(self, chat_id: int, response_text: str) -> bool:
+    #     try:
+    #         if not self.client or not self.client.is_connected():
+    #             logger.error("Client not connected, cannot send message")
+    #             return False
+
+    #         await self.client.send_message(chat_id, response_text, parse_mode="html")
+    #         logger.info(f"Sent intelligent response to chat {chat_id}: {response_text[:50]}...")
+    #         return True
+
+    #     except Exception as e:
+    #         logger.error(f"Error sending intelligent response: {str(e)}")
+    #         return False
+    async def send_intelligent_response(
+        self, chat_id: int, response_text: str, files: Union[str, List[str], None] = None
+    ) -> bool:
         try:
             if not self.client or not self.client.is_connected():
                 logger.error("Client not connected, cannot send message")
                 return False
 
-            await self.client.send_message(chat_id, response_text, parse_mode="html")
-            logger.info(f"Sent intelligent response to chat {chat_id}: {response_text[:50]}...")
+            if files:
+                # Ensure files is a list
+                if isinstance(files, str):
+                    files = [files]
+
+                await self.client.send_file(
+                    chat_id,
+                    file=files,  # can be list or single path
+                    caption=response_text,  # caption is attached to the first media
+                    parse_mode="html",
+                )
+                logger.info(
+                    f"Sent response with {len(files)} file(s) to chat {chat_id}: {response_text[:50]}..."
+                )
+            else:
+                await self.client.send_message(chat_id, response_text, parse_mode="html")
+                logger.info(f"Sent text response to chat {chat_id}: {response_text[:50]}...")
+
             return True
 
         except Exception as e:
@@ -603,6 +634,8 @@ class RealTimeIntelligenceHandler:
                         account_id=message_data.get("account_id", None),
                     )
 
+                    logger.info(f"The search result is: {search_results}")
+
                     intelligent_response = await self.intelligent_response_handler.handle_message(
                         message_data["text"],
                         recent_messages=recent_messages,
@@ -615,7 +648,19 @@ class RealTimeIntelligenceHandler:
                         logger.info(
                             f"The message does not belong to the session owner. Sending intelligent response to chat {chat_id}: {intelligent_response}"
                         )
-                        await self.send_intelligent_response(chat_id, intelligent_response[0])
+
+                        # Find if there is images also.
+                        image_lists: list[str] = []
+
+                        for search_result in search_results:
+                            metadata = search_result.get("metadata")
+                            if metadata is not None:
+                                file_type = metadata.get("type")
+                                if file_type == "image":
+                                    image_lists.append(metadata.get("path"))
+                        await self.send_intelligent_response(
+                            chat_id, intelligent_response[0], files=image_lists
+                        )
 
                 except Exception as e:
                     logger.error(f"Error in intelligent response: {str(e)}")
