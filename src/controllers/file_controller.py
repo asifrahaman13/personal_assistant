@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 import shutil
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fastapi import UploadFile
 import PyPDF2
@@ -14,8 +14,12 @@ from src.logs.logs import logger
 
 class FileController:
     def __init__(self) -> None:
-        self.upload_dir = Path("src/uploads")
-        self.upload_dir.mkdir(parents=True, exist_ok=True)
+        self.upload_docs_dir = Path("src/uploads/docs")
+        self.upload_docs_dir.mkdir(parents=True, exist_ok=True)
+
+        self.upload_image_dir = Path("src/uploads/images")
+        self.upload_image_dir.mkdir(parents=True, exist_ok=True)
+
         self.mongo_manager = MongoDBManager()
         self.embedding_service = SemanticEmbeddingService()
         self.qdrant_service = SemanticQdrantService(
@@ -44,7 +48,13 @@ class FileController:
                 chunks.append(chunk)
         return chunks
 
-    async def process_embeddings(self, current_org: Dict[str, Any], file: UploadFile) -> bool:
+    async def process_embeddings(
+        self,
+        current_org: Dict[str, Any],
+        file: UploadFile,
+        file_type: str,
+        description: Optional[str] = None,
+    ) -> bool:
         try:
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
@@ -60,41 +70,72 @@ class FileController:
 
             logger.info(f"The file name is: {file_name}")
 
-            file_path = self.upload_dir / f"{file_name}"  # type: ignore
+            if file_type == "image":
+                file_path = self.upload_image_dir / f"{file_name}"
 
-            logger.info(f"The file path is: {file_path}")
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
+                sample_metadata = [
+                    {
+                        "image_id": "9374162095873412",
+                        "account_id": organization.get("id"),
+                        "type": "image",
+                        "path": file_path,
+                    }
+                ]  # replicate metadata for each chunk
 
-            print(f"Extracting text from {file_path}...")
-            pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
+                print("=== Sample Use Cases for Semantic Search ===")
 
-            sample_texts = self.chunk_text(pdf_text, chunk_size=50)
-            print(f"Extracted {len(sample_texts)} chunks from PDF")
+                try:
+                    collection_name = "personal_assistant"
+                    if not self.qdrant_service.collection_exists(collection_name):
+                        print(f"Creating collection '{collection_name}'...")
+                        self.qdrant_service.create_collection(collection_name)
+                        print(f"✓ Collection '{collection_name}' created successfully")
+                    else:
+                        print(f"✓ Collection '{collection_name}' already exists")
+                    await self.search_repo.initialize_qdrant_async([description], sample_metadata)  # type: ignore
+                    print("✓ Successfully upserted PDF chunks to Qdrant")
+                except Exception as e:
+                    print(f"✗ Error upserting texts: {e}")
 
-            sample_metadata = [
-                {
-                    "pdf_id": "8374162095873412",
-                    "account_id": organization.get("id"),
-                }
-            ] * len(sample_texts)  # replicate metadata for each chunk
+                return True
 
-            print("=== Sample Use Cases for Semantic Search ===")
+            else:
+                file_path = self.upload_docs_dir / f"{file_name}"  # type: ignore
+                logger.info(f"The file path is: {file_path}")
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(file.file, buffer)
 
-            try:
-                collection_name = "personal_assistant"
-                if not self.qdrant_service.collection_exists(collection_name):
-                    print(f"Creating collection '{collection_name}'...")
-                    self.qdrant_service.create_collection(collection_name)
-                    print(f"✓ Collection '{collection_name}' created successfully")
-                else:
-                    print(f"✓ Collection '{collection_name}' already exists")
-                await self.search_repo.initialize_qdrant_async(sample_texts, sample_metadata)
-                print("✓ Successfully upserted PDF chunks to Qdrant")
-            except Exception as e:
-                print(f"✗ Error upserting texts: {e}")
+                print(f"Extracting text from {file_path}...")
+                pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
 
-            return True
+                sample_texts = self.chunk_text(pdf_text, chunk_size=50)
+                print(f"Extracted {len(sample_texts)} chunks from PDF")
+
+                sample_metadata = [
+                    {
+                        "pdf_id": "8374162095873412",
+                        "account_id": organization.get("id"),
+                        "type": "docs",
+                        "path": file_path,
+                    }
+                ] * len(sample_texts)  # replicate metadata for each chunk
+
+                print("=== Sample Use Cases for Semantic Search ===")
+
+                try:
+                    collection_name = "personal_assistant"
+                    if not self.qdrant_service.collection_exists(collection_name):
+                        print(f"Creating collection '{collection_name}'...")
+                        self.qdrant_service.create_collection(collection_name)
+                        print(f"✓ Collection '{collection_name}' created successfully")
+                    else:
+                        print(f"✓ Collection '{collection_name}' already exists")
+                    await self.search_repo.initialize_qdrant_async(sample_texts, sample_metadata)
+                    print("✓ Successfully upserted PDF chunks to Qdrant")
+                except Exception as e:
+                    print(f"✗ Error upserting texts: {e}")
+
+                return True
 
         except Exception as e:
             return False
