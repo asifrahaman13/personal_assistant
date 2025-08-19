@@ -600,8 +600,6 @@ class RealTimeIntelligenceHandler:
 
                     search_results = await self.rag_repo.query_text(
                         query_text=message_data["text"],
-                        owner_id=message_data.get("owner_id", None),
-                        telegram_group_id=message_data.get("telegram_group_id", None),
                         account_id=message_data.get("account_id", None),
                     )
 

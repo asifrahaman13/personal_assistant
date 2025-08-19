@@ -9,7 +9,10 @@ from typing import Any, Dict, List, Optional
 import aioimaplib
 import aiosmtplib
 
+from index import SemanticSearchRepo
+from src.config.config import config
 from src.core.intelligent_response import IntelligentResponseHandler
+from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 
@@ -109,6 +112,12 @@ class EmailTaskManager:
         self.mongo_manager = MongoDBManager()
         self.client_cache: Dict[str, EmailClient] = {}
         self.check_interval = 10
+        embedding_service = SemanticEmbeddingService()
+        qdrant_service = SemanticQdrantService(
+            url=config.QDRANT_API_URL,
+            api_key=config.QDRANT_API_KEY,
+        )
+        self.rag_repo = SemanticSearchRepo(embedding_service, qdrant_service)
 
     async def start_email_task(
         self,
@@ -177,6 +186,10 @@ class EmailTaskManager:
                 for mail in emails:
                     logger.info(f"Fetched email: {mail.get('subject')} from {mail.get('from')}")
 
+                    search_results = await self.rag_repo.query_text(
+                        query_text=mail.get("body", ""),
+                        account_id=organization_id,
+                    )
                     llm_responses = await intelligent_response_handler.handle_message(
                         mail.get("body", ""),
                         recent_messages=None,
@@ -185,7 +198,7 @@ class EmailTaskManager:
                             "subject": mail.get("subject", ""),
                             "from": mail.get("from", ""),
                         },
-                        search_results=None,
+                        search_results=search_results,
                     )
 
                     reply_text = llm_responses[0] if llm_responses else "Thank you for your email."
