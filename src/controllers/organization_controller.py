@@ -39,6 +39,7 @@ class OrganizationController:
                 "name": org_data.name,
                 "api_id": org_data.api_id,
                 "api_hash": org_data.api_hash,
+                "app_password": org_data.app_password,
                 "phone": org_data.phone,
                 "created_at": datetime.now(timezone.utc),
                 "updated_at": datetime.now(timezone.utc),

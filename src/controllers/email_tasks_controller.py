@@ -26,7 +26,7 @@ class EmailTasksController:
 
             result = await email_task_manager.start_email_task(
                 organization_id=organization_id,
-                email_address=request.email_addresses,
+                email_address=organization.get("email", ""),
                 filters=request.filters,
                 app_password=organization.get("app_password", "")
             )
@@ -38,7 +38,7 @@ class EmailTasksController:
                 success=True,
                 message=result["message"],
                 task_id=result["task_id"],
-                email_addresses=result.get("email_addresses"),
+                email_address=result.get("email_address"),
                 started_at=result.get("started_at"),
             )
         except HTTPException:
@@ -92,7 +92,7 @@ class EmailTasksController:
                 success=True,
                 task_id=result["task_id"],
                 status=result["status"],
-                email_addresses=result.get("email_addresses"),
+                email_address=result.get("email_address"),
                 is_running=result.get("is_running"),
                 started_at=result.get("started_at"),
                 stopped_at=result.get("stopped_at"),
