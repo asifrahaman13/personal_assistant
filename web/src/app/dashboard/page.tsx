@@ -6,6 +6,7 @@ import axios from 'axios';
 import { backend_url } from '@/config/config';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import LoadingDashboard from '@/components/LoadingDashboard';
 
 interface Group {
   id: number;
@@ -80,11 +81,11 @@ export default function Dashboard() {
       const token = localStorage.getItem('org_jwt');
       await axios.post(
         `${backend_url}/api/v1/background-tasks/start`,
-        {}, // If your endpoint needs a body, add it here
+        {},
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       );
       setBgTaskStatus('Started');
-    } catch (err) {
+    } catch {
       setBgTaskError('Failed to start background task');
     } finally {
       setBgTaskLoading(false);
@@ -101,7 +102,7 @@ export default function Dashboard() {
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       );
       setBgTaskStatus('Stopped');
-    } catch (err) {
+    } catch {
       setBgTaskError('Failed to stop background task');
     } finally {
       setBgTaskLoading(false);
@@ -115,11 +116,11 @@ export default function Dashboard() {
       const token = localStorage.getItem('org_jwt');
       await axios.post(
         `${backend_url}/api/v1/email-tasks/start`,
-        {}, // If your endpoint needs a body, add it here
+        {},
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       );
       setBgTaskStatus('Started');
-    } catch (err) {
+    } catch {
       setBgTaskError('Failed to start email task');
     } finally {
       setBgTaskLoading(false);
@@ -144,41 +145,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-            <svg
-              className="animate-spin w-8 h-8 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading Dashboard</h2>
-          <p className="text-gray-600">Fetching your Telegram groups...</p>
-        </motion.div>
-      </div>
-    );
+    return <LoadingDashboard />;
   }
 
   return (
@@ -239,30 +206,6 @@ export default function Dashboard() {
       {/* Group Selector */}
       <div className="">
         <div className=" text-xl font-bold py-2  max-w-7xl mx-auto px-6 mt-8">TELEGRAM</div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="max-w-7xl mx-auto px-6 mt-8"
-        >
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Select Group:</label>
-            <select
-              value={selectedGroup?.id || ''}
-              onChange={(e) => {
-                const group = groups.find((g) => String(g.id) === e.target.value);
-                setSelectedGroup(group || null);
-              }}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
-            >
-              {groups.map((group) => (
-                <option key={group.id} value={group.id}>
-                  {group.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </motion.div>
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-6 py-8">
@@ -375,7 +318,7 @@ export default function Dashboard() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      <span>Analyzing...</span>
+                      <span>Processing...</span>
                     </>
                   ) : (
                     <>
@@ -395,6 +338,27 @@ export default function Dashboard() {
                       <span>Start process</span>
                     </>
                   )}
+                </button>
+
+                <button
+                  className="w-full bg-red-600 backdrop-blur-sm text-white border border-gray-200 py-3 px-4 rounded-xl font-semibold hover:scale-105 hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+                  onClick={stopBackgroundTask}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span>stop process</span>
                 </button>
 
                 <button className="w-full bg-white/80 backdrop-blur-sm text-gray-700 border border-gray-200 py-3 px-4 rounded-xl font-semibold hover:bg-white hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer">
@@ -462,12 +426,6 @@ export default function Dashboard() {
 
       <div className="">
         <div className=" text-xl font-bold py-2  max-w-7xl mx-auto px-6 mt-8">GMAIL</div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="max-w-7xl mx-auto px-6 mt-8"
-        ></motion.div>
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-6 py-8">
@@ -580,7 +538,7 @@ export default function Dashboard() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      <span>Analyzing...</span>
+                      <span>Processing...</span>
                     </>
                   ) : (
                     <>
@@ -600,6 +558,27 @@ export default function Dashboard() {
                       <span>Start process</span>
                     </>
                   )}
+                </button>
+
+                <button
+                  className="w-full bg-red-600 backdrop-blur-sm text-white border border-gray-200 py-3 px-4 rounded-xl font-semibold hover:scale-105 hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer"
+                  onClick={stopEmailBackgroundTask}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span>stop process</span>
                 </button>
 
                 <button className="w-full bg-white/80 backdrop-blur-sm text-gray-700 border border-gray-200 py-3 px-4 rounded-xl font-semibold hover:bg-white hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer">
