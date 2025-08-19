@@ -1,10 +1,14 @@
 import asyncio
 from datetime import datetime, timezone
 import email
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import email.policy
 import hashlib
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import aioimaplib
 import aiosmtplib
@@ -25,11 +29,39 @@ class EmailClient:
         self.imap_server = "imap.gmail.com"
         self.imap_port = 993
 
-    async def send_email(self, to_address: str, subject: str, body: str):
-        msg = MIMEText(body, "html")
+    async def send_email(
+        self,
+        to_address: str,
+        subject: str,
+        body: str,
+        attachments: Union[str, List[str], None] = None,
+    ):
+        msg = MIMEMultipart()
         msg["Subject"] = subject
         msg["From"] = self.email_address
         msg["To"] = to_address
+        msg.attach(MIMEText(body, "html"))
+
+        if attachments:
+            if isinstance(attachments, str):
+                attachments = [attachments]
+
+            for file_path in attachments:
+                with open(file_path, "rb") as f:
+                    if file_path.lower().endswith((".png", ".jpg", ".jpeg", ".gif")):
+                        img = MIMEImage(f.read())
+                        img.add_header(
+                            "Content-Disposition", "attachment", filename=file_path.split("/")[-1]
+                        )
+                        msg.attach(img)
+                    else:
+                        part = MIMEBase("application", "octet-stream")
+                        part.set_payload(f.read())
+                        encoders.encode_base64(part)
+                        part.add_header(
+                            "Content-Disposition", "attachment", filename=file_path.split("/")[-1]
+                        )
+                        msg.attach(part)
 
         await aiosmtplib.send(
             msg,
@@ -189,6 +221,7 @@ class EmailTaskManager:
                         query_text=mail.get("body", ""),
                         account_id=organization_id,
                     )
+
                     llm_responses = await intelligent_response_handler.handle_message(
                         mail.get("body", ""),
                         recent_messages=None,
@@ -202,10 +235,20 @@ class EmailTaskManager:
 
                     reply_text = llm_responses[0] if llm_responses else "Thank you for your email."
 
+                    image_lists: list[str] = []
+
+                    for search_result in search_results:
+                        metadata = search_result.get("metadata")
+                        if metadata is not None:
+                            file_type = metadata.get("type")
+                            if file_type == "image":
+                                image_lists.append(metadata.get("path"))
+
                     await email_client.send_email(
                         to_address=mail.get("from"),  # type: ignore
                         subject=f"Re: {mail.get('subject')}",
                         body=reply_text,
+                        attachments=image_lists,
                     )
                     logger.info(f"Sent LLM reply to {mail.get('from')}")
 

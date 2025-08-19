@@ -529,19 +529,6 @@ class RealTimeIntelligenceHandler:
             logger.error(f"Error fetching recent messages: {str(e)}")
             return []
 
-    # async def send_intelligent_response(self, chat_id: int, response_text: str) -> bool:
-    #     try:
-    #         if not self.client or not self.client.is_connected():
-    #             logger.error("Client not connected, cannot send message")
-    #             return False
-
-    #         await self.client.send_message(chat_id, response_text, parse_mode="html")
-    #         logger.info(f"Sent intelligent response to chat {chat_id}: {response_text[:50]}...")
-    #         return True
-
-    #     except Exception as e:
-    #         logger.error(f"Error sending intelligent response: {str(e)}")
-    #         return False
     async def send_intelligent_response(
         self, chat_id: int, response_text: str, files: Union[str, List[str], None] = None
     ) -> bool:
