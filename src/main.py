@@ -6,6 +6,7 @@ from src.routers import (
     auth_router,
     background_tasks_router,
     email_tasks_router,
+    file_router,
     organization_router,
 )
 
@@ -29,6 +30,7 @@ app.include_router(
     background_tasks_router, prefix="/api/v1/background-tasks", tags=["Background Tasks"]
 )
 app.include_router(email_tasks_router, prefix="/api/v1/email-tasks", tags=["Email Tasks"])
+app.include_router(file_router, prefix="/api/v1/uploads", tags=["File router"])
 
 
 @app.get("/")

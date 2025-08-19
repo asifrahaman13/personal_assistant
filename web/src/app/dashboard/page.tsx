@@ -6,6 +6,7 @@ import axios from 'axios';
 import { backend_url } from '@/config/config';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import FileUpload from '@/components/FileUpload';
 
 export default function Dashboard() {
   const [startDate, setStartDate] = useState(() => {
@@ -157,7 +158,7 @@ export default function Dashboard() {
     };
     const interval = setInterval(() => {
       fetchStatusAsync();
-    }, 5000);
+    }, 500000);
 
     return () => clearInterval(interval);
   }, []);
@@ -583,7 +584,10 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            ></motion.div>
+            >
+
+              <FileUpload/>
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
