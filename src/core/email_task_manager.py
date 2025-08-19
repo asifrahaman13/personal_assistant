@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional
 import aioimaplib
 import aiosmtplib
 
-from index import SemanticSearchRepo
 from src.config.config import config
 from src.core.intelligent_response import IntelligentResponseHandler
 from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo

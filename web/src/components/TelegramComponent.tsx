@@ -90,10 +90,10 @@ const TelegramComponent = () => {
     <React.Fragment>
       {/* Group Selector */}
       <div className="">
-        <div className=" text-xl font-bold py-2  max-w-7xl mx-auto px-6 mt-8">TELEGRAM</div>
+        <div className=" text-xl font-bold max-w-8xl ">TELEGRAM</div>
 
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-8xl py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
