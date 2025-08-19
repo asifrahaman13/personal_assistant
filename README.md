@@ -1,16 +1,6 @@
-# Telegram Group Analyzer - Production Ready
+## AI BASED PERSONAL ASSISTANT
 
 A production-ready Personalized assistant.
-
-
-<img width="1905" height="964" alt="Screenshot from 2025-07-30 10-22-32" src="https://github.com/user-attachments/assets/8ad73723-b3ba-4c6a-9bc8-a98469648925" />
-
-<img width="1905" height="964" alt="Screenshot from 2025-07-30 10-22-47" src="https://github.com/user-attachments/assets/dba7ad46-30b1-4c58-9425-786d4dfb80a9" />
-
-<img width="1905" height="964" alt="Screenshot from 2025-07-30 10-41-18" src="https://github.com/user-attachments/assets/702625fd-59a6-4d6c-9a9d-60ad37045ead" />
-
-<img width="1905" height="964" alt="Screenshot from 2025-07-30 10-21-56" src="https://github.com/user-attachments/assets/63eb9e92-f894-48c2-98b7-b6b97a8c0ce4" />
-
 
 ## 🚀 Production Features
 
