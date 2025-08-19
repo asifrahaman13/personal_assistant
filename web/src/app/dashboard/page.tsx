@@ -110,8 +110,8 @@ export default function Dashboard() {
   };
 
   const startEmailBackgroundTask = async () => {
-    setBgTaskLoading(true);
-    setBgTaskError('');
+    setBgEmTaskLoading(true);
+    setBgEmTaskError('');
     try {
       const token = localStorage.getItem('org_jwt');
       await axios.post(
@@ -119,30 +119,77 @@ export default function Dashboard() {
         {},
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       );
-      setBgTaskStatus('Started');
+      setBgEmTaskStatus('Started');
     } catch {
-      setBgTaskError('Failed to start email task');
+      setBgEmTaskError('Failed to start email task');
     } finally {
-      setBgTaskLoading(false);
+      setBgEmTaskLoading(false);
     }
   };
 
   const stopEmailBackgroundTask = async () => {
-    setBgTaskLoading(true);
-    setBgTaskError('');
+    setBgEmTaskLoading(true);
+    setBgEmTaskError('');
     try {
       const token = localStorage.getItem('org_jwt');
       await axios.delete(
         `${backend_url}/api/v1/email-tasks/stop`,
         token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
       );
-      setBgTaskStatus('Stopped');
-    } catch (err) {
-      setBgTaskError('Failed to stop email task');
+      setBgEmTaskStatus('Stopped');
+    } catch {
+      setBgEmTaskError('Failed to stop email task');
     } finally {
-      setBgTaskLoading(false);
+      setBgEmTaskLoading(false);
     }
   };
+
+  const fetchEmStatus = async () => {
+    try {
+      const token = localStorage.getItem('org_jwt');
+      const response = await axios.get(`${backend_url}/api/v1/email-tasks/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setBgEmTaskStatus(response.data.status);
+      }
+    } catch {
+      console.log('Something went wrong');
+    }
+  };
+
+  const fetchTgStatus = async () => {
+    try {
+      const token = localStorage.getItem('org_jwt');
+      const response = await axios.get(`${backend_url}/api/v1/background-tasks/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        console.log(response.data);
+        setBgTaskStatus(response.data.status);
+      }
+    } catch {
+      console.log('Something went wrong');
+    }
+  };
+
+  useEffect(() => {
+    fetchTgStatus();
+    fetchEmStatus();
+
+    const interval = setInterval(() => {
+      fetchTgStatus();
+      fetchEmStatus();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return <LoadingDashboard />;
@@ -263,7 +310,29 @@ export default function Dashboard() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
             >
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+
+                {bgTaskStatus && (
+                  <span
+                    className={`
+        px-3 py-1 rounded-full text-sm font-medium
+        ${
+          bgTaskStatus === 'running'
+            ? 'bg-green-100 text-green-700 border border-green-300'
+            : bgTaskStatus === 'started'
+              ? 'bg-blue-100 text-blue-700 border border-blue-300'
+              : bgTaskStatus === 'stopped'
+                ? 'bg-red-100 text-red-700 border border-red-300'
+                : 'bg-gray-100 text-gray-600 border border-gray-300'
+        }
+      `}
+                  >
+                    {bgTaskStatus}
+                  </span>
+                )}
+              </div>
+
               <div className="space-y-4">
                 {/* Date range pickers */}
                 <div className="grid grid-cols-2 gap-3">
@@ -483,7 +552,31 @@ export default function Dashboard() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
             >
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+
+                {bgEmTaskStatus === null ? (
+                  <span className="text-gray-500 text-sm italic">no event</span>
+                ) : (
+                  <span
+                    className={`
+        px-3 py-1 rounded-full text-sm font-medium capitalize
+        ${
+          bgEmTaskStatus === 'running'
+            ? 'bg-green-100 text-green-700 border border-green-300'
+            : bgEmTaskStatus === 'started'
+              ? 'bg-blue-100 text-blue-700 border border-blue-300'
+              : bgEmTaskStatus === 'stopped'
+                ? 'bg-red-100 text-red-700 border border-red-300'
+                : 'bg-gray-100 text-gray-600 border border-gray-300'
+        }
+      `}
+                  >
+                    {bgEmTaskStatus}
+                  </span>
+                )}
+              </div>
+
               <div className="space-y-4">
                 {/* Date range pickers */}
                 <div className="grid grid-cols-2 gap-3">
@@ -513,10 +606,10 @@ export default function Dashboard() {
                 </div>
                 <button
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 cursor-pointer"
-                  disabled={bgTaskLoading || !selectedGroup}
+                  disabled={bgEmTaskLoading}
                   onClick={startEmailBackgroundTask}
                 >
-                  {bgTaskLoading ? (
+                  {bgEmTaskLoading ? (
                     <>
                       <svg
                         className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -538,7 +631,7 @@ export default function Dashboard() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      <span>Processing...</span>
+                      <span>Processing... {} </span>
                     </>
                   ) : (
                     <>
@@ -599,13 +692,13 @@ export default function Dashboard() {
                   <span>Settings</span>
                 </button>
 
-                {bgTaskError && (
+                {bgEmTaskError && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"
                   >
-                    {bgTaskError}
+                    {bgEmTaskError}
                   </motion.div>
                 )}
               </div>
