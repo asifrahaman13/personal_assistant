@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import FileUpload from './FileUpload';
 import { backend_url } from '@/config/config';
 import axios from 'axios';
 
@@ -90,10 +89,10 @@ const EmailComponent = () => {
   return (
     <React.Fragment>
       <div className="">
-        <div className=" text-xl font-bold py-2  max-w-7xl mx-auto px-6 mt-8">GMAIL</div>
+        <div className=" text-xl font-bold   max-w-8xl ">GMAIL</div>
 
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="max-w-8xl  py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -265,9 +264,7 @@ const EmailComponent = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            >
-              <FileUpload />
-            </motion.div>
+            ></motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
