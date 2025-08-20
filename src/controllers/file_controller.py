@@ -7,7 +7,7 @@ from fastapi import UploadFile
 import PyPDF2
 
 from src.config.config import config
-from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
+from src.core import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 

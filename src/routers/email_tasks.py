@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.controllers.email_tasks_controller import EmailTasksController
+from src.controllers import EmailTasksController
 from src.models.email_models import (
     EmailTaskRequest,
     EmailTaskResponse,

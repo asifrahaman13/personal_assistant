@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from src.core.background_task_manager import background_task_manager
+from src.core import background_task_manager
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 from src.models.telegram_models import (

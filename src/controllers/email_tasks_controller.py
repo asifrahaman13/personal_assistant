@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from src.core.email_task_manager import email_task_manager
+from src.core import email_task_manager
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 from src.models.email_models import (

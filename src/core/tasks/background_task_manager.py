@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-from src.core.realtime_intelligence import RealTimeIntelligenceHandler
+from src.core.tasks.realtime_intelligence import RealTimeIntelligenceHandler
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 

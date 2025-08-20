@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 
 import openai
 
@@ -8,20 +9,27 @@ from src.logs.logs import logger
 
 class Model(Enum):
     GPT_4_1 = "gpt-4.1"
+    GPT_5 = "gpt-5"
+    GPT_5_CHAT = "gpt-5-chat"
+    GOOGLE_GEMMA_3N = "google/gemma-3n-e4b-it"
 
 
 class LLMManager:
     def __init__(self):
         self.api_key = config.OPENAI_API_KEY
-        if not self.api_key:
+        self.ai_ml_api_key = config.AI_ML_API_KEY
+        if not self.api_key or not self.ai_ml_api_key:
             logger.warning("OPENAI_API_KEY not found in environment variables")
             return
 
-        openai.api_key = self.api_key
-        self.client = openai.AsyncOpenAI(api_key=self.api_key)
+        # openai.api_key = self.api_key
+        # self.client = openai.AsyncOpenAI(api_key=self.api_key)
+        self.client = openai.AsyncOpenAI(
+            base_url="https://api.aimlapi.com/v1", api_key=self.ai_ml_api_key
+        )
         self.max_tokens = 500
         self.top_p = 0.1
-        self.temperature = 0.1
+        self.temperature = 1
 
     async def generate_response(
         self,
@@ -41,10 +49,11 @@ class LLMManager:
                 """
 
             response = await self.client.chat.completions.create(
-                model=Model.GPT_4_1.value,
+                # model=Model.GPT_4_1.value,
+                model=Model.GOOGLE_GEMMA_3N.value,
                 messages=[
                     {
-                        "role": "system",
+                        "role": "user",
                         "content": f"""Your task is to give a proper and valid response to the message. You are a helpful assistant. You  have some context which you can use as knowledge base for better response. 
                         Format your response using HTML tags that Telegram supports. Remember it should be a valid HTML code ready to be parsed by Telegram.
                         - Use <b>text</b> for bold text
@@ -71,9 +80,9 @@ class LLMManager:
                     },
                     {"role": "user", "content": prompt},
                 ],
-                max_tokens=self.max_tokens,
+                # max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                top_p=self.top_p,
+                # top_p=self.top_p,
             )
 
             result = (
@@ -83,7 +92,9 @@ class LLMManager:
             )
 
             logger.info(f"Result: {result}")
-            return result
+
+            cleaned = re.sub(r"^```(?:html)?\s*|\s*```$", "", result, flags=re.DOTALL).strip()
+            return cleaned
         except Exception as e:
             logger.error(f"Error in LLM response generation: {str(e)}")
             return ""

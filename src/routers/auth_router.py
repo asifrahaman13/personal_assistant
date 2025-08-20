@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.auth.tokens import get_current_org
-from src.controllers.auth_controller import AuthController
+from src.controllers import AuthController
 from src.models.telegram_models import (
     CodeRequest,
     CodeResponse,

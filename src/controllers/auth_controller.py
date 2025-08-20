@@ -9,7 +9,7 @@ from src.auth.tokens import (
     get_password_hash,
     verify_password,
 )
-from src.core.analyzer import ProductionTelegramAnalyzer
+from src.core import ProductionTelegramAnalyzer
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 from src.models.telegram_models import (

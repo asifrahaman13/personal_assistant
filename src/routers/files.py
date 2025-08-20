@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from src.auth.tokens import get_current_org
-from src.controllers.file_controller import FileController
+from src.controllers import FileController
 from src.logs.logs import logger
 from src.models.response_model import FileUploadResponse
 

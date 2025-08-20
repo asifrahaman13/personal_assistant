@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.controllers.organization_controller import OrganizationController
+from src.controllers import OrganizationController
 from src.models.telegram_models import (
     Organization,
     OrganizationCreate,

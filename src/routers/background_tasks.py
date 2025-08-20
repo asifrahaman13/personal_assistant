@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.controllers.background_tasks_controller import BackgroundTasksController
+from src.controllers import BackgroundTasksController
 from src.models.telegram_models import (
     BackgroundTaskRequest,
     BackgroundTaskResponse,

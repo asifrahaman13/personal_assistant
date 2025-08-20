@@ -14,8 +14,8 @@ import aioimaplib
 import aiosmtplib
 
 from src.config.config import config
-from src.core.intelligent_response import IntelligentResponseHandler
 from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
+from src.core.tasks.intelligent_response import IntelligentResponseHandler
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
 

@@ -6,8 +6,8 @@ from telethon.sessions import StringSession
 from telethon.tl.types import Channel, Chat, Message
 
 from src.config.config import config
-from src.core.intelligent_response import IntelligentResponseHandler
 from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
+from src.core.tasks.intelligent_response import IntelligentResponseHandler
 from src.db.mongodb import MongoDBManager
 from src.llm import LLMManager
 from src.logs.logs import logger

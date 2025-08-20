@@ -30,7 +30,6 @@ class SemanticEmbeddingService:
             self.client = None
 
     async def get_embeddings(self, text: str, model: str = "text-embedding-3-small") -> List[float]:
-        """Fetch embeddings from OpenAI asynchronously with caching"""
         if text in self.embeddings_cache:
             self.embeddings_cache.move_to_end(text)
             return self.embeddings_cache[text]
