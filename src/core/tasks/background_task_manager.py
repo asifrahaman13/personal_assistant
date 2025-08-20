@@ -123,7 +123,7 @@ class BackgroundTaskManager:
 
     async def get_active_tasks(self) -> Dict[str, Any]:
         active_tasks = {}
-        for org_id, task in self.active_tasks.items():
+        for org_id, _ in self.active_tasks.items():
             handler = self.task_handlers.get(org_id)
             active_tasks[org_id] = {
                 "task_id": org_id,

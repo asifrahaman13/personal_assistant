@@ -11,35 +11,6 @@ A production-ready Personalized AI Powered second brain assistant.
 - **Session Management**: Secure session storage in database
 - **Real-Time Messaging**: WebSocket-like functionality for live message reception
 
-## 📊 Analysis Features
-
-- **Unique User Tracking**: Count and analyze unique users in groups
-- **User Activity**: Track most active users
-- **Message Statistics**: Comprehensive message analytics
-- **Chunked Processing**: Efficient handling of large message volumes with configurable chunk sizes
-- **Multiple LLM Support**: OpenAI GPT-4 and Google Gemini Pro integration for AI-powered analysis
-
-## 🔄 Real-Time Capabilities
-
-**Telegram does NOT provide native WebSocket APIs**, but offers several real-time options:
-
-### 1. **Telethon Event System** (Implemented)
-- Uses long polling with event handlers
-- Provides WebSocket-like functionality
-- Messages received as they arrive
-- Automatic sentiment analysis
-- Custom handlers per group
-
-### 2. **Telegram Bot API Webhooks**
-- HTTP POST requests for bot updates
-- Requires public HTTPS endpoint
-- Limited to bot functionality
-
-### 3. **MTProto Protocol**
-- Telegram's native protocol
-- Used by Telethon library
-- Provides real-time updates
-- Most reliable for user accounts
 
 ## 🛠️ Production Setup
 
@@ -51,16 +22,6 @@ cp env.example .env
 ```
 
 Edit `.env` with your credentials:
-
-```bash
-# Required for OpenAI integration
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Required for Gemini integration  
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Other required variables...
-```
 
 Start the production stack:
 ```bash
@@ -102,7 +63,7 @@ The application creates the following collections:
 docker-compose up -d
 
 # View logs
-docker-compose logs -f telegram-analyzer
+docker-compose logs -f persona_ai 
 
 # Stop services
 docker-compose down

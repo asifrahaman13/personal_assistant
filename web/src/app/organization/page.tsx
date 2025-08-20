@@ -51,7 +51,7 @@ export default function OrganizationAuthPage() {
         localStorage.setItem('telegram_phone', res.data.phone);
 
         setTimeout(() => {
-          router.push('/dashboard');
+          router.push('/dashboard/rag');
         }, 1500);
       } else {
         setMessage('Signup successful! Now submit your organization credentials.');
@@ -91,7 +91,7 @@ export default function OrganizationAuthPage() {
 
   useEffect(() => {
     if (token && mode === 'login') {
-      router.push('/dashboard');
+      router.push('/dashboard/rag');
     }
   }, [token, mode, router]);
 
