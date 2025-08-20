@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -363,117 +363,6 @@ class RealTimeIntelligenceHandler:
 
         return False
 
-    async def update_detailed_analysis(self, group_id: int, message_data: Dict):
-        try:
-            normalized_group_id = self._normalize_group_id(group_id)
-
-            group_info = await self.mongo_manager.find_one(
-                "groups",
-                {
-                    "organization_id": self.organization_id,
-                    "group_id": normalized_group_id,
-                },
-            )
-
-            group_type = "unknown"
-            group_category = "unknown"
-            size_category = "unknown"
-            if group_info:
-                group_type = group_info.get("group_type", "unknown")
-                group_category = group_info.get("group_category", "unknown")
-                size_category = group_info.get("size_category", "unknown")
-
-            today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-            tomorrow = today + timedelta(days=1)
-
-            existing_analysis = await self.mongo_manager.find_one(
-                "detailed_analyses",
-                {
-                    "organization_id": self.organization_id,
-                    "group_id": normalized_group_id,
-                    "analysis_date": {"$gte": today, "$lt": tomorrow},
-                },
-            )
-
-            if existing_analysis:
-                logger.info(f"Updating existing detailed analysis for group {group_id}")
-
-                summary = existing_analysis.get("summary", {})
-                summary["total_messages"] = summary.get("total_messages", 0) + 1
-
-                sentiment_dist = summary.get("sentiment_distribution", {})
-                current_sentiment = message_data.get("sentiment", "neutral")
-                sentiment_dist[current_sentiment] = sentiment_dist.get(current_sentiment, 0) + 1
-                summary["sentiment_distribution"] = sentiment_dist
-
-                total_polarity = summary.get("total_polarity", 0) + message_data.get(
-                    "polarity", 0.0
-                )
-                summary["total_polarity"] = total_polarity
-                summary["average_sentiment"] = total_polarity / summary["total_messages"]
-
-                user_activity = existing_analysis.get("user_activity", {})
-                user_message_counts = user_activity.get("user_message_counts", {})
-                sender_id = str(message_data.get("sender_id", "unknown"))
-                user_message_counts[sender_id] = user_message_counts.get(sender_id, 0) + 1
-                user_activity["user_message_counts"] = user_message_counts
-
-                top_users = sorted(
-                    user_message_counts.items(),
-                    key=lambda x: x[1],
-                    reverse=True,
-                )[:5]
-                user_activity["top_users"] = top_users
-
-                update_doc = {
-                    "summary": summary,
-                    "user_activity": user_activity,
-                    "updated_at": datetime.now(timezone.utc),
-                }
-
-                await self.mongo_manager.update_one(
-                    "detailed_analyses",
-                    {"_id": existing_analysis["_id"]},
-                    update_doc,
-                )
-
-                logger.info(
-                    f"Updated existing detailed analysis for group {group_id} (normalized: {normalized_group_id}) with new message"
-                )
-
-            else:
-                logger.info(f"Creating new detailed analysis for group {group_id}")
-
-                detailed_analysis = {
-                    "organization_id": self.organization_id,
-                    "group_id": normalized_group_id,
-                    "group_title": message_data.get("chat_title", "Unknown"),
-                    "group_type": group_type,
-                    "group_category": group_category,
-                    "size_category": size_category,
-                    "analysis_date": datetime.now(timezone.utc),
-                    "time_period_days": 1,  # Real-time analysis
-                    "summary": {
-                        "total_messages": 1,
-                        "unique_users": 1,
-                        "average_sentiment": message_data.get("polarity", 0.0),
-                        "total_polarity": message_data.get("polarity", 0.0),
-                        "sentiment_distribution": {message_data.get("sentiment", "neutral"): 1},
-                    },
-                    "user_activity": {
-                        "user_message_counts": {str(message_data.get("sender_id", "unknown")): 1},
-                        "top_users": [(str(message_data.get("sender_id", "unknown")), 1)],
-                    },
-                }
-
-                await self.mongo_manager.insert_one("detailed_analyses", detailed_analysis)
-                logger.info(
-                    f"Created new detailed analysis for group {group_id} (normalized: {normalized_group_id}) with first message"
-                )
-
-        except Exception as e:
-            logger.error(f"Error updating detailed analysis: {str(e)}")
-
     async def get_message_ownership(self, message: Message) -> bool:
         current_user = None
         is_own_message = False
@@ -530,28 +419,59 @@ class RealTimeIntelligenceHandler:
             return []
 
     async def send_intelligent_response(
-        self, chat_id: int, response_text: str, files: Union[str, List[str], None] = None
+        self,
+        chat_id: int,
+        response_text: str,
+        images: Union[str, List[str], None] = None,
+        videos: Union[str, List[str], None] = None,
+        audios: Union[str, List[str], None] = None,
     ) -> bool:
         try:
             if not self.client or not self.client.is_connected():
                 logger.error("Client not connected, cannot send message")
                 return False
 
-            if files:
-                # Ensure files is a list
-                if isinstance(files, str):
-                    files = [files]
+            # Helper to normalize into list
+            def to_list(f):
+                if not f:
+                    return []
+                return [f] if isinstance(f, str) else f
 
+            images, videos, audios = to_list(images), to_list(videos), to_list(audios)
+
+            sent_any = False
+
+            if images:
                 await self.client.send_file(
                     chat_id,
-                    file=files,  # can be list or single path
-                    caption=response_text,  # caption is attached to the first media
+                    file=images,
+                    caption=response_text,
                     parse_mode="html",
                 )
-                logger.info(
-                    f"Sent response with {len(files)} file(s) to chat {chat_id}: {response_text[:50]}..."
+                logger.info(f"Sent {len(images)} image(s) to chat {chat_id}")
+                sent_any = True
+
+            if videos:
+                await self.client.send_file(
+                    chat_id,
+                    file=videos,
+                    caption=response_text if not sent_any else None,  # type: ignore
+                    parse_mode="html",
                 )
-            else:
+                logger.info(f"Sent {len(videos)} video(s) to chat {chat_id}")
+                sent_any = True
+
+            if audios:
+                await self.client.send_file(
+                    chat_id,
+                    file=audios,
+                    caption=response_text if not sent_any else None,  # type: ignore
+                    parse_mode="html",
+                )
+                logger.info(f"Sent {len(audios)} audio(s) to chat {chat_id}")
+                sent_any = True
+
+            if not sent_any:
                 await self.client.send_message(chat_id, response_text, parse_mode="html")
                 logger.info(f"Sent text response to chat {chat_id}: {response_text[:50]}...")
 
@@ -603,11 +523,9 @@ class RealTimeIntelligenceHandler:
                     f"Starting intelligent response for message: {message_data['text'][:50]}..."
                 )
                 try:
-                    # Get recent messages for context
                     chat_id = message_data["chat_id"]
                     recent_messages = await self.get_recent_messages(chat_id, limit=30)
 
-                    # Add current message to the history
                     current_message = {
                         "text": message_data["text"],
                         "sender_name": message_data["sender_name"],
@@ -635,18 +553,15 @@ class RealTimeIntelligenceHandler:
                         logger.info(
                             f"The message does not belong to the session owner. Sending intelligent response to chat {chat_id}: {intelligent_response}"
                         )
-
-                        # Find if there is images also.
-                        image_lists: list[str] = []
-
-                        for search_result in search_results:
-                            metadata = search_result.get("metadata")
-                            if metadata is not None:
-                                file_type = metadata.get("type")
-                                if file_type == "image":
-                                    image_lists.append(metadata.get("path"))
+                        image_lists, video_lists, audio_lists = self.extract_media_files(
+                            search_results
+                        )
                         await self.send_intelligent_response(
-                            chat_id, intelligent_response[0], files=image_lists
+                            chat_id,
+                            intelligent_response[0],
+                            images=image_lists,
+                            videos=video_lists,
+                            audios=audio_lists,
                         )
 
                 except Exception as e:
@@ -668,6 +583,33 @@ class RealTimeIntelligenceHandler:
         except Exception as e:
             logger.error(f"Error processing message: {str(e)}")
             return {}
+
+    def extract_media_files(
+        self, search_results: List[Dict]
+    ) -> Tuple[List[str], List[str], List[str]]:
+        image_files: List[str] = []
+        video_files: List[str] = []
+        audio_files: List[str] = []
+
+        for search_result in search_results:
+            metadata = search_result.get("metadata")
+            if not metadata:
+                continue
+
+            file_type = metadata.get("type")
+            file_path = metadata.get("path")
+
+            if not file_type or not file_path:
+                continue
+
+            if file_type == "image":
+                image_files.append(file_path)
+            elif file_type == "video":
+                video_files.append(file_path)
+            elif file_type == "audio":
+                audio_files.append(file_path)
+
+        return image_files, video_files, audio_files
 
     async def handle_new_message(self, event):
         try:

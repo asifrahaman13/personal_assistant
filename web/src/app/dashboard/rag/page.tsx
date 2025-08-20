@@ -26,7 +26,7 @@ export default function Page() {
     formData.append('file', file);
     formData.append('file_type', fileType);
 
-    if (fileType === 'image') {
+    if (['image', 'audio', 'video'].includes(fileType)) {
       formData.append('description', description);
     } else {
       formData.append('description', '');
@@ -61,21 +61,23 @@ export default function Page() {
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="image">Image</option>
-            <option value="pdf">PDF</option>
+            <option value="docs">PDF / Docs</option>
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
           </select>
         </div>
 
-        {/* If image, show description input */}
-        {fileType === 'image' && (
+        {/* Description input for image, audio, video */}
+        {['image', 'audio', 'video'].includes(fileType) && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-600 mb-1">
-              Image Description
+              {fileType.charAt(0).toUpperCase() + fileType.slice(1)} Description
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter a short description..."
+              placeholder={`Enter a short description for the ${fileType}...`}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -85,6 +87,15 @@ export default function Page() {
         <div className="mb-4">
           <input
             type="file"
+            accept={
+              fileType === 'image'
+                ? 'image/*'
+                : fileType === 'audio'
+                  ? 'audio/*'
+                  : fileType === 'video'
+                    ? 'video/*'
+                    : '.pdf,.doc,.docx'
+            }
             onChange={handleFileChange}
             className="w-full text-sm text-gray-600 border border-gray-300 rounded-lg p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
           />

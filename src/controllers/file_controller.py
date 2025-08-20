@@ -20,6 +20,19 @@ class FileController:
         self.upload_image_dir = Path("src/uploads/images")
         self.upload_image_dir.mkdir(parents=True, exist_ok=True)
 
+        self.upload_video_dir = Path("src/uploads/videos")
+        self.upload_video_dir.mkdir(parents=True, exist_ok=True)
+
+        self.upload_audio_dir = Path("src/uploads/audios")
+        self.upload_audio_dir.mkdir(parents=True, exist_ok=True)
+
+        self.upload_dirs = {
+            "docs": self.upload_docs_dir,
+            "image": self.upload_image_dir,
+            "video": self.upload_video_dir,
+            "audio": self.upload_audio_dir,
+        }
+
         self.mongo_manager = MongoDBManager()
         self.embedding_service = SemanticEmbeddingService()
         self.qdrant_service = SemanticQdrantService(
@@ -59,85 +72,62 @@ class FileController:
             organization = await self.mongo_manager.find_one(
                 "organizations", {"email": current_org["email"]}
             )
-
-            logger.info(f"The organizatin is: {current_org}")
-
-            if organization is None:
+            if not organization:
+                logger.warning("Organization not found")
                 return False
 
-            organization_id = organization.get("id", "")
-            file_name = f"{organization_id}_{file.filename}"
+            org_id = organization.get("id", "")
+            file_name = f"{org_id}_{file.filename}"
 
-            logger.info(f"The file name is: {file_name}")
+            if file_type not in self.upload_dirs:
+                logger.error(f"Unsupported file type: {file_type}")
+                return False
 
-            if file_type == "image":
-                file_path = self.upload_image_dir / f"{file_name}"
-                with open(file_path, "wb") as buffer:
-                    shutil.copyfileobj(file.file, buffer)
+            file_path = self.upload_dirs[file_type] / file_name
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
 
-                sample_metadata = [
-                    {
-                        "image_id": "9374162095873412",
-                        "account_id": organization.get("id"),
-                        "type": "image",
-                        "path": file_path,
-                    }
-                ]  # replicate metadata for each chunk
+            logger.info(f"Saved {file_type} file: {file_path}")
 
-                print("=== Sample Use Cases for Semantic Search ===")
+            sample_texts = []
+            if file_type == "docs":
+                pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
+                sample_texts = self.chunk_text(pdf_text, chunk_size=50)
 
-                try:
-                    collection_name = "personal_assistant"
-                    if not self.qdrant_service.collection_exists(collection_name):
-                        print(f"Creating collection '{collection_name}'...")
-                        self.qdrant_service.create_collection(collection_name)
-                        print(f"✓ Collection '{collection_name}' created successfully")
-                    else:
-                        print(f"✓ Collection '{collection_name}' already exists")
-                    await self.search_repo.initialize_qdrant_async([description], sample_metadata)  # type: ignore
-                    print("✓ Successfully upserted PDF chunks to Qdrant")
-                except Exception as e:
-                    print(f"✗ Error upserting texts: {e}")
+            elif file_type == "image":
+                sample_texts = [description or file.filename]
 
-                return True
+            elif file_type == "audio":
+                sample_texts = [description or file.filename]
+
+            elif file_type == "video":
+                sample_texts = [description or file.filename]
 
             else:
-                file_path = self.upload_docs_dir / f"{file_name}"  # type: ignore
-                logger.info(f"The file path is: {file_path}")
-                with open(file_path, "wb") as buffer:
-                    shutil.copyfileobj(file.file, buffer)
+                logger.error(f"Unhandled file type: {file_type}")
+                return False
 
-                print(f"Extracting text from {file_path}...")
-                pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
+            sample_metadata = [
+                {
+                    "account_id": org_id,
+                    "type": file_type,
+                    "path": str(file_path),
+                }
+            ] * len(sample_texts)
 
-                sample_texts = self.chunk_text(pdf_text, chunk_size=50)
-                print(f"Extracted {len(sample_texts)} chunks from PDF")
+            collection_name = "personal_assistant"
+            if not self.qdrant_service.collection_exists(collection_name):
+                logger.info(f"Creating collection '{collection_name}'...")
+                self.qdrant_service.create_collection(collection_name)
+                logger.info(f"✓ Collection '{collection_name}' created successfully")
+            else:
+                logger.info(f"✓ Collection '{collection_name}' already exists")
 
-                sample_metadata = [
-                    {
-                        "pdf_id": "8374162095873412",
-                        "account_id": organization.get("id"),
-                        "type": "docs",
-                        "path": file_path,
-                    }
-                ] * len(sample_texts)  # replicate metadata for each chunk
+            await self.search_repo.initialize_qdrant_async(sample_texts, sample_metadata)  # type: ignore
+            logger.info(f"✓ Successfully upserted {len(sample_texts)} chunks for {file_type}")
 
-                print("=== Sample Use Cases for Semantic Search ===")
-
-                try:
-                    collection_name = "personal_assistant"
-                    if not self.qdrant_service.collection_exists(collection_name):
-                        print(f"Creating collection '{collection_name}'...")
-                        self.qdrant_service.create_collection(collection_name)
-                        print(f"✓ Collection '{collection_name}' created successfully")
-                    else:
-                        print(f"✓ Collection '{collection_name}' already exists")
-                    await self.search_repo.initialize_qdrant_async(sample_texts, sample_metadata)
-                    print("✓ Successfully upserted PDF chunks to Qdrant")
-                except Exception as e:
-                    print(f"✗ Error upserting texts: {e}")
-
-                return True
+            return True
 
         except Exception as e:
+            logger.error(f"Error in process_embeddings: {e}", exc_info=True)
             return False
