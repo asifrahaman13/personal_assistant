@@ -143,3 +143,41 @@ class EmailTasksController:
         except Exception as e:
             logger.error(f"Error stopping all email tasks: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Failed to stop all email tasks: {str(e)}")
+
+    async def get_email_stats(self, current_org: dict) -> dict:
+        try:
+            mongo_manager = MongoDBManager()
+            organization = await mongo_manager.find_one(
+                "organizations", {"email": current_org["email"]}
+            )
+            if not organization:
+                raise HTTPException(status_code=404, detail="Organization not found")
+
+            organization_id = organization["id"]
+
+            # Query emails for this organization
+            emails = await mongo_manager.find_many("emails", {"organization_id": organization_id})
+
+            logger.info(f"The emalls are : {emails}")
+
+            total_emails = len(emails)
+            unique_senders = len(set(email.get("to_address") for email in emails))
+            replies_sent = sum(1 for email in emails if email.get("body"))  # adjust logic as needed
+
+            # Date range
+            dates = [email.get("created_at") for email in emails if email.get("created_at")]
+            date_range = {
+                "start": min(dates) if dates else None,  # type: ignore
+                "end": max(dates) if dates else None,  # type: ignore
+            }
+
+            return {
+                "success": True,
+                "total_emails": total_emails,
+                "unique_senders": unique_senders,
+                "replies_sent": replies_sent,
+                "date_range": date_range,
+            }
+        except Exception as e:
+            logger.error(f"Error fetching email stats: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Failed to fetch email stats: {str(e)}")

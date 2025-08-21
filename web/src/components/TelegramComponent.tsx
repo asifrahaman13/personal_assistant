@@ -6,6 +6,17 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { fetchStatusInterval } from '@/config/config';
 
+export type EmailStats = {
+  success: boolean;
+  total_messages: number;
+  unique_senders: number;
+  replies_sent: number;
+  date_range: {
+    start: string | null;
+    end: string | null;
+  };
+};
+
 const TelegramComponent = () => {
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -17,6 +28,27 @@ const TelegramComponent = () => {
   const [bgTaskStatus, setBgTaskStatus] = useState<string | null>(null);
   const [bgTaskLoading, setBgTaskLoading] = useState(false);
   const [bgTaskError, setBgTaskError] = useState('');
+  const [tgStats, setTgStats] = useState<EmailStats | null>(null);
+
+  const fetchTgStats = async () => {
+    try {
+      const token = localStorage.getItem('org_jwt');
+      const response = await axios.get(`${backend_url}/api/v1/background-tasks/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        setTgStats(response.data);
+      }
+    } catch {
+      setTgStats(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchTgStats();
+  }, []);
 
   const startBackgroundTask = async () => {
     setBgTaskLoading(true);
@@ -272,7 +304,78 @@ const TelegramComponent = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            ></motion.div>
+            >
+              <h2 className="text-lg font-bold mb-4">Telegram Stats</h2>
+              {tgStats ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center bg-blue-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-blue-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 8h10M7 12h6m-6 4h10"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-blue-700">
+                      {tgStats.total_messages}
+                    </span>
+                    <span className="text-sm text-gray-500">Total Messages</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-green-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-green-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 4a4 4 0 110 8 4 4 0 010-8z"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-green-700">
+                      {tgStats.unique_senders}
+                    </span>
+                    <span className="text-sm text-gray-500">Unique Senders</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-purple-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-purple-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 12v4m0 0l-2-2m2 2l2-2"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-purple-700">
+                      {tgStats.replies_sent}
+                    </span>
+                    <span className="text-sm text-gray-500">Replies Sent</span>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-gray-500">No stats available</span>
+              )}
+            </motion.div>
           </motion.div>
         </main>
       </div>

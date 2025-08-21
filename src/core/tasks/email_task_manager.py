@@ -256,6 +256,7 @@ class EmailTaskManager:
                     )
 
                     doc = {
+                        "organization_id": organization_id,
                         "to_address": mail.get("from"),
                         "subject": mail.get("subject"),
                         "body": mail.get("subject"),

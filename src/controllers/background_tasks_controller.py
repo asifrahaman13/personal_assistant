@@ -151,3 +151,45 @@ class BackgroundTasksController:
             raise HTTPException(
                 status_code=500, detail=f"Failed to stop all background tasks: {str(e)}"
             )
+
+    async def get_tg_stats(self, current_org: dict) -> dict:
+        try:
+            mongo_manager = MongoDBManager()
+            organization = await mongo_manager.find_one(
+                "organizations", {"email": current_org["email"]}
+            )
+            if not organization:
+                raise HTTPException(status_code=404, detail="Organization not found")
+
+            organization_id = organization["id"]
+
+            messages = await mongo_manager.find_many(
+                "messages", {"organization_id": organization_id}
+            )
+
+            logger.info(f"The emalls are : {messages}")
+
+            total_messages = len(messages)
+            unique_senders = len(set(message.get("sender_id") for message in messages))
+            replies_sent = sum(
+                1 for message in messages if message.get("text")
+            )  # adjust logic as needed
+
+            dates = [message.get("created_at") for message in messages if message.get("created_at")]
+            date_range = {
+                "start": min(dates) if dates else None,  # type: ignore
+                "end": max(dates) if dates else None,  # type: ignore
+            }
+
+            return {
+                "success": True,
+                "total_messages": total_messages,
+                "unique_senders": unique_senders,
+                "replies_sent": replies_sent,
+                "date_range": date_range,
+            }
+        except Exception as e:
+            logger.error(f"Error fetching tg messages stats: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Failed to fetch tg messages stats: {str(e)}"
+            )
