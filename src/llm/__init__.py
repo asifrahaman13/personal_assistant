@@ -1,3 +1,3 @@
-from .openai_sdk import LLMManager
+from .llm_manager import LLMManager
 
 __all__ = ["LLMManager"]

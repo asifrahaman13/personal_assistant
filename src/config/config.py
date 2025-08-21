@@ -44,6 +44,7 @@ class Config:
     QDRANT_API_KEY: str = field(default_factory=lambda: require_env("QDRANT_API_KEY"))
     EMAIL_APP_PASSWORD: str = field(default_factory=lambda: require_env("EMAIL_PASSWORD"))
     AI_ML_API_KEY: str = field(default_factory=lambda: require_env("AI_ML_API"))
+    SERVICE: str = field(default_factory=lambda: require_env("SERVICE"))
 
 
 config = Config()
