@@ -16,10 +16,11 @@ import aioimaplib
 import aiosmtplib
 
 from src.config.config import config
-from src.core.rag.qdrant import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
-from src.core.tasks.intelligent_response import IntelligentResponseHandler
+from src.core import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
+
+from .intelligent_response import IntelligentResponseHandler
 
 
 class EmailClient:
@@ -305,7 +306,7 @@ class EmailTaskManager:
 
     async def get_active_tasks(self) -> Dict[str, Any]:
         active_tasks = {}
-        for org_id, task in self.active_tasks.items():
+        for org_id, _ in self.active_tasks.items():
             active_tasks[org_id] = {
                 "task_id": org_id,
                 "status": "running",

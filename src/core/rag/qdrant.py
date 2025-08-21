@@ -16,6 +16,7 @@ class SemanticEmbeddingService:
     def __init__(self, cache_size: int = 1000) -> None:
         self.embeddings_cache: OrderedDict[str, List[float]] = OrderedDict()
         self.cache_size = cache_size
+        self.dimension = 1536
 
         if not config.OPENAI_API_KEY:
             logger.error("OPENAI_API_KEY not available")
@@ -64,6 +65,7 @@ class SemanticEmbeddingService:
 class SemanticQdrantService:
     def __init__(self, url: str, api_key: str) -> None:
         self.client = QdrantClient(url=url, api_key=api_key)
+        self.dimension = 1536
 
     def collection_exists(self, collection_name: str) -> bool:
         try:
@@ -76,9 +78,7 @@ class SemanticQdrantService:
         if not self.collection_exists(collection_name):
             self.client.create_collection(
                 collection_name=collection_name,
-                vectors_config=VectorParams(
-                    size=1536, distance=Distance.COSINE
-                ),  # Using 1536 dimensions
+                vectors_config=VectorParams(size=self.dimension, distance=Distance.COSINE),
             )
 
     def upsert_points(self, collection_name: str, points: list[PointStruct]) -> None:
@@ -132,7 +132,7 @@ class SemanticSearchRepo:
         ) -> list[PointStruct]:
             async with semaphore:
                 tasks = []
-                for text, meta in zip(batch_texts, batch_metadata):
+                for text, _ in zip(batch_texts, batch_metadata):
                     task = self.embedding_service.get_embeddings(text)
                     tasks.append(task)
 
@@ -147,7 +147,6 @@ class SemanticSearchRepo:
                     for text, meta, embedding in zip(batch_texts, batch_metadata, embeddings)
                 ]
 
-        # Process in batches of 25
         batch_size = 25
         all_points = []
 

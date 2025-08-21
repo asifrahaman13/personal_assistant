@@ -35,5 +35,4 @@ async def list_email_tasks(current_org=Depends(get_current_org)):
 
 @email_tasks_router.delete("/stop-all")
 async def stop_all_email_tasks(current_org=Depends(get_current_org)):
-    """Stop all active email tasks (admin only)"""
     return await controller.stop_all_email_tasks(current_org)
