@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { backend_url } from '@/config/config';
 import axios from 'axios';
+import { fetchStatusInterval } from '@/config/config';
 
 const EmailComponent = () => {
   const [startDate, setStartDate] = useState(() => {
@@ -81,7 +82,7 @@ const EmailComponent = () => {
     };
     const interval = setInterval(() => {
       fetchStatusAsync();
-    }, 5000);
+    }, fetchStatusInterval);
 
     return () => clearInterval(interval);
   }, []);
