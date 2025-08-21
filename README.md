@@ -1,15 +1,20 @@
 ## AI POWERED SECOND BRAIN
 
-A production-ready Personalized AI Powered second brain assistant.
+A production-ready, Personalized AI-powered second brain assistant.
+
 
 ## 🚀 Production Features
 
-- **MongoDB Storage**: Session data, messages, and analysis results stored in MongoDB
-- **Caching**: Intelligent message caching to reduce API calls
-- **Docker Support**: Complete containerized deployment
-- **Scalable**: Designed for production workloads
-- **Session Management**: Secure session storage in database
-- **Real-Time Messaging**: WebSocket-like functionality for live message reception
+### Telegram auto reply as an AI AI-powered second brain. Capable of giving text as well as multimedia responses.
+
+<img width="378" height="765" alt="Screenshot from 2025-08-21 10-18-14" src="https://github.com/user-attachments/assets/ed6eb565-173a-4353-9178-0db06279dac5" />
+<img width="378" height="765" alt="Screenshot from 2025-08-21 10-18-51" src="https://github.com/user-attachments/assets/8bcc5f11-ae0f-4d49-89f2-451abd6f676b" />
+<img width="378" height="765" alt="Screenshot from 2025-08-21 10-19-20" src="https://github.com/user-attachments/assets/6e1a96b1-734b-4860-af73-00202e4ad12f" />
+
+### Email-based auto response. 
+
+<img width="1511" height="734" alt="Screenshot from 2025-08-21 10-20-12" src="https://github.com/user-attachments/assets/9924a3eb-3c20-4df8-9bf3-946ab59a709e" />
+<img width="1590" height="644" alt="Screenshot from 2025-08-21 10-21-57" src="https://github.com/user-attachments/assets/474c3d9c-399b-461c-8b89-f599520a3167" />
 
 
 ## 🛠️ Production Setup
