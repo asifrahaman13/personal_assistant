@@ -302,7 +302,7 @@ const EmailComponent = () => {
                 <div className="flex flex-col items-center bg-green-50 rounded-xl p-4 shadow w-full">
                   <span className="text-lg font-bold text-green-700 mb-2">Stats Overview</span>
                   <div className="w-full flex flex-col items-center">
-                    <svg width="240" height="240" viewBox="0 0 240 240">
+                    <svg width="240" height="260" viewBox="0 0 240 260">
                       {/* Total Emails Bar */}
                       <rect
                         x="30"
@@ -360,14 +360,14 @@ const EmailComponent = () => {
                       >
                         {emailStats.replies_sent}
                       </text>
-                      {/* Labels */}
-                      <text x="50" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                      {/* Labels - moved lower */}
+                      <text x="50" y="250" textAnchor="middle" fontSize="18" fill="#555">
                         Total
                       </text>
-                      <text x="120" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                      <text x="120" y="250" textAnchor="middle" fontSize="18" fill="#555">
                         Unique
                       </text>
-                      <text x="190" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                      <text x="190" y="250" textAnchor="middle" fontSize="18" fill="#555">
                         Replies
                       </text>
                     </svg>
