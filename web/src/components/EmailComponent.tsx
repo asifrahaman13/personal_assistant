@@ -81,7 +81,7 @@ const EmailComponent = () => {
     };
     const interval = setInterval(() => {
       fetchStatusAsync();
-    }, 500000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
