@@ -297,7 +297,84 @@ const EmailComponent = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            ></motion.div>
+            >
+              {emailStats && (
+                <div className="flex flex-col items-center bg-green-50 rounded-xl p-4 shadow w-full">
+                  <span className="text-lg font-bold text-green-700 mb-2">Stats Overview</span>
+                  <div className="w-full flex flex-col items-center">
+                    <svg width="240" height="240" viewBox="0 0 240 240">
+                      {/* Total Emails Bar */}
+                      <rect
+                        x="30"
+                        y={220 - Math.min(emailStats.total_emails, 200)}
+                        width="40"
+                        height={Math.min(emailStats.total_emails, 200)}
+                        fill="#3b82f6"
+                        rx="8"
+                      />
+                      <text
+                        x="50"
+                        y={220 - Math.min(emailStats.total_emails, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#3b82f6"
+                      >
+                        {emailStats.total_emails}
+                      </text>
+                      {/* Unique Senders Bar */}
+                      <rect
+                        x="100"
+                        y={220 - Math.min(emailStats.unique_senders, 200)}
+                        width="40"
+                        height={Math.min(emailStats.unique_senders, 200)}
+                        fill="#22c55e"
+                        rx="8"
+                      />
+                      <text
+                        x="120"
+                        y={220 - Math.min(emailStats.unique_senders, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#22c55e"
+                      >
+                        {emailStats.unique_senders}
+                      </text>
+                      {/* Replies Sent Bar */}
+                      <rect
+                        x="170"
+                        y={220 - Math.min(emailStats.replies_sent, 200)}
+                        width="40"
+                        height={Math.min(emailStats.replies_sent, 200)}
+                        fill="#a78bfa"
+                        rx="8"
+                      />
+                      <text
+                        x="190"
+                        y={220 - Math.min(emailStats.replies_sent, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#a78bfa"
+                      >
+                        {emailStats.replies_sent}
+                      </text>
+                      {/* Labels */}
+                      <text x="50" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                        Total
+                      </text>
+                      <text x="120" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                        Unique
+                      </text>
+                      <text x="190" y="235" textAnchor="middle" fontSize="18" fill="#555">
+                        Replies
+                      </text>
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
