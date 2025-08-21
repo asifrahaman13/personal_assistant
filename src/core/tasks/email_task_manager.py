@@ -192,13 +192,6 @@ class EmailTaskManager:
                 "started_at": datetime.now(timezone.utc),
             }
 
-            await self.mongo_manager.update_one(
-                "email_tasks",
-                {"organization_id": organization_id},
-                task_info,
-                upsert=True,
-            )
-
             logger.info(f"Started email task for organization {organization_id}")
 
             return {
@@ -287,12 +280,6 @@ class EmailTaskManager:
             task.cancel()
             del self.active_tasks[organization_id]
 
-            await self.mongo_manager.update_one(
-                "email_tasks",
-                {"organization_id": organization_id},
-                {"status": "stopped", "stopped_at": datetime.now(timezone.utc)},
-            )
-
             logger.info(f"Stopped email task for organization {organization_id}")
 
             return {
@@ -324,22 +311,12 @@ class EmailTaskManager:
                     "is_running": True,
                 }
             else:
-                task_info = await self.mongo_manager.find_one(
-                    "email_tasks", {"organization_id": organization_id}
-                )
-                if task_info:
-                    return {
-                        "success": True,
-                        "task_id": organization_id,
-                        "status": task_info.get("status", "unknown"),
-                        "started_at": task_info.get("started_at"),
-                        "stopped_at": task_info.get("stopped_at"),
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "message": f"No email task found for organization {organization_id}",
-                    }
+                return {
+                    "success": True,
+                    "task_id": organization_id,
+                    "status": "stopped",
+                    "is_running": False,
+                }
         except Exception as e:
             logger.error(f"Error getting email task status: {str(e)}")
             return {"success": False, "message": f"Failed to get email task status: {str(e)}"}

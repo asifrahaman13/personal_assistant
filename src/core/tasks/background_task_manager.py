@@ -50,10 +50,6 @@ class BackgroundTaskManager:
                 "last_activity": datetime.now(timezone.utc),
             }
 
-            await self.mongo_manager.update_one(
-                "background_tasks", {"organization_id": organization_id}, task_info, upsert=True
-            )
-
             logger.info(f"Started background intelligence task for organization {organization_id}")
 
             return {
@@ -85,12 +81,6 @@ class BackgroundTaskManager:
                 del self.task_handlers[organization_id]
 
             del self.active_tasks[organization_id]
-
-            await self.mongo_manager.update_one(
-                "background_tasks",
-                {"organization_id": organization_id},
-                {"status": "stopped", "stopped_at": datetime.now(timezone.utc)},
-            )
 
             logger.info(f"Stopped background intelligence task for organization {organization_id}")
 
@@ -146,23 +136,12 @@ class BackgroundTaskManager:
                     "is_running": handler.is_running if handler else False,
                 }
             else:
-                task_info = await self.mongo_manager.find_one(
-                    "background_tasks", {"organization_id": organization_id}
-                )
-
-                if task_info:
-                    return {
-                        "success": True,
-                        "task_id": organization_id,
-                        "status": task_info.get("status", "unknown"),
-                        "started_at": task_info.get("started_at"),
-                        "stopped_at": task_info.get("stopped_at"),
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "message": f"No task found for organization {organization_id}",
-                    }
+                return {
+                    "success": True,
+                    "task_id": organization_id,
+                    "status": "stopped",
+                    "is_running": False,
+                }
 
         except Exception as e:
             logger.error(f"Error getting task status: {str(e)}")
