@@ -6,6 +6,17 @@ import { backend_url } from '@/config/config';
 import axios from 'axios';
 import { fetchStatusInterval } from '@/config/config';
 
+type EmailStats = {
+  success: boolean;
+  total_emails: number;
+  unique_senders: number;
+  replies_sent: number;
+  date_range: {
+    start: string | null;
+    end: string | null;
+  };
+};
+
 const EmailComponent = () => {
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -16,6 +27,27 @@ const EmailComponent = () => {
   const [bgEmTaskStatus, setBgEmTaskStatus] = useState<string | null>(null);
   const [bgEmTaskLoading, setBgEmTaskLoading] = useState(false);
   const [bgEmTaskError, setBgEmTaskError] = useState('');
+  const [emailStats, setEmailStats] = useState<EmailStats | null>(null);
+
+  const fetchEmailStats = async () => {
+    try {
+      const token = localStorage.getItem('org_jwt');
+      const response = await axios.get(`${backend_url}/api/v1/email-tasks/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 200) {
+        setEmailStats(response.data);
+      }
+    } catch {
+      setEmailStats(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmailStats();
+  }, []);
 
   const startEmailBackgroundTask = async () => {
     setBgEmTaskLoading(true);
@@ -265,13 +297,161 @@ const EmailComponent = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            ></motion.div>
+            >
+              {emailStats && (
+                <div className="flex flex-col items-center bg-green-50 rounded-xl p-4 shadow w-full">
+                  <span className="text-lg font-bold text-green-700 mb-2">Stats Overview</span>
+                  <div className="w-full flex flex-col items-center">
+                    <svg width="240" height="260" viewBox="0 0 240 260">
+                      {/* Total Emails Bar */}
+                      <rect
+                        x="30"
+                        y={220 - Math.min(emailStats.total_emails, 200)}
+                        width="40"
+                        height={Math.min(emailStats.total_emails, 200)}
+                        fill="#3b82f6"
+                        rx="8"
+                      />
+                      <text
+                        x="50"
+                        y={220 - Math.min(emailStats.total_emails, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#3b82f6"
+                      >
+                        {emailStats.total_emails}
+                      </text>
+                      {/* Unique Senders Bar */}
+                      <rect
+                        x="100"
+                        y={220 - Math.min(emailStats.unique_senders, 200)}
+                        width="40"
+                        height={Math.min(emailStats.unique_senders, 200)}
+                        fill="#22c55e"
+                        rx="8"
+                      />
+                      <text
+                        x="120"
+                        y={220 - Math.min(emailStats.unique_senders, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#22c55e"
+                      >
+                        {emailStats.unique_senders}
+                      </text>
+                      {/* Replies Sent Bar */}
+                      <rect
+                        x="170"
+                        y={220 - Math.min(emailStats.replies_sent, 200)}
+                        width="40"
+                        height={Math.min(emailStats.replies_sent, 200)}
+                        fill="#a78bfa"
+                        rx="8"
+                      />
+                      <text
+                        x="190"
+                        y={220 - Math.min(emailStats.replies_sent, 200) - 15}
+                        textAnchor="middle"
+                        fontSize="24"
+                        fontWeight="bold"
+                        fill="#a78bfa"
+                      >
+                        {emailStats.replies_sent}
+                      </text>
+                      {/* Labels - moved lower */}
+                      <text x="50" y="250" textAnchor="middle" fontSize="18" fill="#555">
+                        Total
+                      </text>
+                      <text x="120" y="250" textAnchor="middle" fontSize="18" fill="#555">
+                        Unique
+                      </text>
+                      <text x="190" y="250" textAnchor="middle" fontSize="18" fill="#555">
+                        Replies
+                      </text>
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-6"
-            ></motion.div>
+            >
+              <h2 className="text-lg font-bold mb-4">Email Stats</h2>
+              {emailStats ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center bg-blue-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-blue-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm-8 0V8a4 4 0 018 0v4"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-blue-700">
+                      {emailStats.total_emails}
+                    </span>
+                    <span className="text-sm text-gray-500">Total Emails</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-green-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-green-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 4a4 4 0 110 8 4 4 0 010-8z"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-green-700">
+                      {emailStats.unique_senders}
+                    </span>
+                    <span className="text-sm text-gray-500">Unique Senders</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-purple-50 rounded-xl p-4 shadow">
+                    <svg
+                      className="w-8 h-8 text-purple-500 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 12v4m0 0l-2-2m2 2l2-2"
+                      />
+                    </svg>
+                    <span className="text-2xl font-bold text-purple-700">
+                      {emailStats.replies_sent}
+                    </span>
+                    <span className="text-sm text-gray-500">Replies Sent</span>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-gray-500">No stats available</span>
+              )}
+            </motion.div>
           </motion.div>
         </main>
       </div>

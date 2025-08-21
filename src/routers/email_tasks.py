@@ -36,3 +36,8 @@ async def list_email_tasks(current_org=Depends(get_current_org)):
 @email_tasks_router.delete("/stop-all")
 async def stop_all_email_tasks(current_org=Depends(get_current_org)):
     return await controller.stop_all_email_tasks(current_org)
+
+
+@email_tasks_router.get("/stats")
+async def get_email_stats(current_org=Depends(get_current_org)):
+    return await controller.get_email_stats(current_org)

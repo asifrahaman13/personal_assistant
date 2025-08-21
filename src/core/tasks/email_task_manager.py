@@ -254,6 +254,20 @@ class EmailTaskManager:
                         body=reply_text,
                         attachments=attachments,
                     )
+
+                    doc = {
+                        "organization_id": organization_id,
+                        "to_address": mail.get("from"),
+                        "subject": mail.get("subject"),
+                        "body": mail.get("subject"),
+                        "attachments": attachments,
+                        "created_at": datetime.now(timezone.utc),
+                        "thread_id": mail.get("thread_id"),
+                        "email_uid": mail.get("uid"),
+                        "hash": mail.get("hash"),
+                    }
+                    await self.mongo_manager.insert_one("emails", doc)
+
                     logger.info(f"Sent LLM reply to {mail.get('from')}")
 
                 await asyncio.sleep(self.check_interval)

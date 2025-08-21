@@ -95,8 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Integrations
         </Link>
       </div>
-
-      {children}
+      <div className="flex justify-center ">{children}</div>
     </div>
   );
 }
