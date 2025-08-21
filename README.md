@@ -16,6 +16,10 @@ A production-ready, Personalized AI-powered second brain assistant.
 <img width="1511" height="734" alt="Screenshot from 2025-08-21 10-20-12" src="https://github.com/user-attachments/assets/9924a3eb-3c20-4df8-9bf3-946ab59a709e" />
 <img width="1590" height="644" alt="Screenshot from 2025-08-21 10-21-57" src="https://github.com/user-attachments/assets/474c3d9c-399b-461c-8b89-f599520a3167" />
 
+### Dashboard for data and visualization
+
+<img width="1893" height="959" alt="Screenshot from 2025-08-21 16-46-24" src="https://github.com/user-attachments/assets/4ca5127b-ce3a-4e00-a9eb-3f8362cb0a86" />
+
 
 ## 🛠️ Production Setup
 
