@@ -10,6 +10,7 @@ from src.config.config import config
 from src.core import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
 from src.logs.logs import logger
+from src.voice.transcription import DeepgramTranscription
 
 
 class FileController:
@@ -39,6 +40,7 @@ class FileController:
             url=config.QDRANT_API_URL, api_key=config.QDRANT_API_KEY
         )
         self.search_repo = SemanticSearchRepo(self.embedding_service, self.qdrant_service)
+        self.deepgram_transcription = DeepgramTranscription()
 
     def extract_text_from_pdf(self, pdf_path: str) -> str:
         pdf_file = Path(pdf_path)
@@ -98,10 +100,14 @@ class FileController:
                 sample_texts = [description or file.filename]
 
             elif file_type == "audio":
-                sample_texts = [description or file.filename]
+                transcription = self.deepgram_transcription.transcribe(file_path)  # type: ignore
+                sample_texts = self.chunk_text(transcription, chunk_size=50)
+                sample_texts.extend([description])  # type: ignore
 
             elif file_type == "video":
-                sample_texts = [description or file.filename]
+                transcription = self.deepgram_transcription.transcribe(file_path)  # type: ignore
+                sample_texts = self.chunk_text(transcription, chunk_size=50)
+                sample_texts.extend([description or file.filename])  # type: ignore
 
             else:
                 logger.error(f"Unhandled file type: {file_type}")
