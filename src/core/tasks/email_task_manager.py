@@ -248,6 +248,7 @@ class EmailTaskManager:
                             if file_type in ["image", "video", "audio", "sound", "voice"]:
                                 attachments.append(file_path)
 
+                    attachments = list(set(attachments))
                     await email_client.send_email(
                         to_address=mail.get("from"),  # type: ignore
                         subject=f"Re: {mail.get('subject')}",

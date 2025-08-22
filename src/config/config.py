@@ -45,6 +45,7 @@ class Config:
     EMAIL_APP_PASSWORD: str = field(default_factory=lambda: require_env("EMAIL_PASSWORD"))
     AI_ML_API_KEY: str = field(default_factory=lambda: require_env("AI_ML_API"))
     SERVICE: str = field(default_factory=lambda: require_env("SERVICE"))
+    DEEPGRAM_API_KEY: str = field(default_factory=lambda: require_env("DEEPGRAM_API_KEY"))
 
 
 config = Config()

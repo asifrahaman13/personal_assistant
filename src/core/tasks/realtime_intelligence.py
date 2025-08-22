@@ -609,6 +609,10 @@ class RealTimeIntelligenceHandler:
             elif file_type == "audio":
                 audio_files.append(file_path)
 
+        image_files = list(set(image_files))
+        video_files = list(set(video_files))
+        audio_files = list(set(audio_files))
+
         return image_files, video_files, audio_files
 
     async def handle_new_message(self, event):
