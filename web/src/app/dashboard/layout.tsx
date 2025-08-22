@@ -87,9 +87,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
       </motion.header>
 
-      <div className="flex max-w-7xl  w-full gap-6 px-20 py-4">
-        <Link href="/dashboard/rag" className={linkClasses('/dashboard/rag')}>
-          RAG
+      <div className="flex max-w-8xl w-8xl justify-center gap-6 py-4">
+        <Link href="/dashboard/uploads" className={linkClasses('/dashboard/uploads')}>
+          Uploads
         </Link>
         <Link href="/dashboard/integrations" className={linkClasses('/dashboard/integrations')}>
           Integrations

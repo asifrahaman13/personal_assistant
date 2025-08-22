@@ -100,12 +100,12 @@ class FileController:
                 sample_texts = [description or file.filename]
 
             elif file_type == "audio":
-                transcription = self.deepgram_transcription.transcribe(file_path)  # type: ignore
+                transcription = await self.deepgram_transcription.transcribe(file_path)  # type: ignore
                 sample_texts = self.chunk_text(transcription, chunk_size=50)
                 sample_texts.extend([description])  # type: ignore
 
             elif file_type == "video":
-                transcription = self.deepgram_transcription.transcribe(file_path)  # type: ignore
+                transcription = await self.deepgram_transcription.transcribe(file_path)  # type: ignore
                 sample_texts = self.chunk_text(transcription, chunk_size=50)
                 sample_texts.extend([description or file.filename])  # type: ignore
 
