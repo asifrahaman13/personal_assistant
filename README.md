@@ -13,7 +13,8 @@ A production-ready, Personalized AI-powered second brain assistant.
 
 ### Email-based auto response. 
 
-<img width="1511" height="734" alt="Screenshot from 2025-08-21 10-20-12" src="https://github.com/user-attachments/assets/9924a3eb-3c20-4df8-9bf3-946ab59a709e" />
+<img width="1526" height="810" alt="Screenshot from 2025-08-23 10-20-41" src="https://github.com/user-attachments/assets/013744f1-c940-47a8-9cfa-775ed1e3642b" />
+<img width="1580" height="786" alt="Screenshot from 2025-08-23 10-22-32" src="https://github.com/user-attachments/assets/7b23811d-f07b-4a33-84e2-716948e7094a" />
 <img width="1590" height="644" alt="Screenshot from 2025-08-21 10-21-57" src="https://github.com/user-attachments/assets/474c3d9c-399b-461c-8b89-f599520a3167" />
 
 ### Dashboard for data and visualization
