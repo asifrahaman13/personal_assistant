@@ -12,6 +12,7 @@ import hashlib
 import mimetypes
 from typing import Any, Dict, List, Optional, Union
 
+import aiofiles
 import aioimaplib
 import aiosmtplib
 
@@ -56,18 +57,18 @@ class EmailClient:
 
                 maintype, subtype = ctype.split("/", 1)
 
-                with open(file_path, "rb") as f:
+                async with aiofiles.open(file_path, "rb") as f:
                     if maintype == "image":
-                        part = MIMEImage(f.read(), _subtype=subtype)
+                        part = MIMEImage(await f.read(), _subtype=subtype)
                     elif maintype == "audio":
-                        part = MIMEAudio(f.read(), _subtype=subtype)
+                        part = MIMEAudio(await f.read(), _subtype=subtype)
                     elif maintype == "application" and subtype == "pdf":
                         part = MIMEBase(maintype, subtype)
-                        part.set_payload(f.read())
+                        part.set_payload(await f.read())
                         encoders.encode_base64(part)
                     else:
                         part = MIMEBase(maintype, subtype)
-                        part.set_payload(f.read())
+                        part.set_payload(await f.read())
                         encoders.encode_base64(part)
 
                     part.add_header(

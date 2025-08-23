@@ -1,3 +1,4 @@
+import asyncio
 import base64
 from pathlib import Path
 import re
@@ -46,17 +47,20 @@ class FileController:
         self.deepgram_transcription = DeepgramTranscription()
         self.llm_manager = LLMManager()
 
-    def extract_text_from_pdf(self, pdf_path: str) -> str:
+    async def extract_text_from_pdf(self, pdf_path: str) -> str:
         pdf_file = Path(pdf_path)
         if not pdf_file.exists():
             raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
-        text = ""
-        with open(pdf_file, "rb") as f:
-            reader = PyPDF2.PdfReader(f)
-            for page in reader.pages:
-                text += page.extract_text() or ""
-        return text
+        def _read_pdf():
+            text = ""
+            with open(pdf_file, "rb") as f:
+                reader = PyPDF2.PdfReader(f)
+                for page in reader.pages:
+                    text += page.extract_text() or ""
+            return text
+
+        return await asyncio.to_thread(_read_pdf)
 
     def chunk_text(self, text: str, chunk_size: int = 50) -> list[str]:
         words = re.split(r"\s+", text.strip())
@@ -90,14 +94,15 @@ class FileController:
                 return False
 
             file_path = self.upload_dirs[file_type] / file_name
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
+            async with aiofiles.open(file_path, "wb") as buffer:
+                while chunk := await file.read(1024 * 1024):  # 1 MB chunks
+                    await buffer.write(chunk)
 
             logger.info(f"Saved {file_type} file: {file_path}")
 
             sample_texts = []
             if file_type == "pdf":
-                pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
+                pdf_text = await self.extract_text_from_pdf(file_path)  # type: ignore
                 sample_texts = self.chunk_text(pdf_text, chunk_size=50)
 
             elif file_type == "image":
