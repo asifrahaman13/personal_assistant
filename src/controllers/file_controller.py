@@ -1,14 +1,17 @@
+import base64
 from pathlib import Path
 import re
 import shutil
 from typing import Any, Dict, Optional
 
+import aiofiles
 from fastapi import UploadFile
 import PyPDF2
 
 from src.config.config import config
 from src.core import SemanticEmbeddingService, SemanticQdrantService, SemanticSearchRepo
 from src.db.mongodb import MongoDBManager
+from src.llm.llm_manager import LLMManager
 from src.logs.logs import logger
 from src.voice.transcription import DeepgramTranscription
 
@@ -28,7 +31,7 @@ class FileController:
         self.upload_audio_dir.mkdir(parents=True, exist_ok=True)
 
         self.upload_dirs = {
-            "docs": self.upload_docs_dir,
+            "pdf": self.upload_docs_dir,
             "image": self.upload_image_dir,
             "video": self.upload_video_dir,
             "audio": self.upload_audio_dir,
@@ -41,6 +44,7 @@ class FileController:
         )
         self.search_repo = SemanticSearchRepo(self.embedding_service, self.qdrant_service)
         self.deepgram_transcription = DeepgramTranscription()
+        self.llm_manager = LLMManager()
 
     def extract_text_from_pdf(self, pdf_path: str) -> str:
         pdf_file = Path(pdf_path)
@@ -92,12 +96,14 @@ class FileController:
             logger.info(f"Saved {file_type} file: {file_path}")
 
             sample_texts = []
-            if file_type == "docs":
+            if file_type == "pdf":
                 pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
                 sample_texts = self.chunk_text(pdf_text, chunk_size=50)
 
             elif file_type == "image":
-                sample_texts = [description or file.filename]
+                image_description = await self.image_description(file_path)  # type: ignore
+                sample_texts = self.chunk_text(image_description, chunk_size=50)
+                sample_texts.extend([description])  # type: ignore
 
             elif file_type == "audio":
                 transcription = await self.deepgram_transcription.transcribe(file_path)  # type: ignore
@@ -107,7 +113,7 @@ class FileController:
             elif file_type == "video":
                 transcription = await self.deepgram_transcription.transcribe(file_path)  # type: ignore
                 sample_texts = self.chunk_text(transcription, chunk_size=50)
-                sample_texts.extend([description or file.filename])  # type: ignore
+                sample_texts.extend([description])  # type: ignore
 
             else:
                 logger.error(f"Unhandled file type: {file_type}")
@@ -137,3 +143,12 @@ class FileController:
         except Exception as e:
             logger.error(f"Error in process_embeddings: {e}", exc_info=True)
             return False
+
+    async def image_description(self, image_path: str) -> str:
+        async with aiofiles.open(image_path, "rb") as img_file:
+            image_bytes = await img_file.read()
+            image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+        description = await self.llm_manager.image_descriptor(image_base64)
+        logger.info(f"Image Description: {description}")
+        return description

@@ -61,8 +61,11 @@ class EmailClient:
                         part = MIMEImage(f.read(), _subtype=subtype)
                     elif maintype == "audio":
                         part = MIMEAudio(f.read(), _subtype=subtype)
+                    elif maintype == "application" and subtype == "pdf":
+                        part = MIMEBase(maintype, subtype)
+                        part.set_payload(f.read())
+                        encoders.encode_base64(part)
                     else:
-                        # video or any other binary file
                         part = MIMEBase(maintype, subtype)
                         part.set_payload(f.read())
                         encoders.encode_base64(part)
@@ -245,7 +248,7 @@ class EmailTaskManager:
                             file_type = metadata.get("type")
                             file_path = metadata.get("path")
 
-                            if file_type in ["image", "video", "audio", "sound", "voice"]:
+                            if file_type in ["image", "video", "audio", "sound", "voice", "pdf"]:
                                 attachments.append(file_path)
 
                     attachments = list(set(attachments))
