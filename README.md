@@ -22,6 +22,13 @@ A production-ready, Personalized AI-powered second brain assistant.
 <img width="1893" height="959" alt="Screenshot from 2025-08-21 16-46-24" src="https://github.com/user-attachments/assets/4ca5127b-ce3a-4e00-a9eb-3f8362cb0a86" />
 
 
+## 🏯 Architecture
+
+A high level architecture of the application can bed described using the following image:
+
+<img width="1230" height="635" alt="Screenshot from 2025-08-23 16-27-37" src="https://github.com/user-attachments/assets/577bf740-c5b3-44ff-8cd9-6b17c13bb712" />
+
+
 ## 🛠️ Production Setup
 
 ### 1. Environment Configuration
