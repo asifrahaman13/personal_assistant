@@ -65,7 +65,7 @@ export default function Page() {
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="image">Image</option>
-            <option value="docs">PDF / Docs</option>
+            <option value="pdf">PDF / Docs</option>
             <option value="audio">Audio</option>
             <option value="video">Video</option>
           </select>

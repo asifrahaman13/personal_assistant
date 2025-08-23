@@ -31,7 +31,7 @@ class FileController:
         self.upload_audio_dir.mkdir(parents=True, exist_ok=True)
 
         self.upload_dirs = {
-            "docs": self.upload_docs_dir,
+            "pdf": self.upload_docs_dir,
             "image": self.upload_image_dir,
             "video": self.upload_video_dir,
             "audio": self.upload_audio_dir,
@@ -96,7 +96,7 @@ class FileController:
             logger.info(f"Saved {file_type} file: {file_path}")
 
             sample_texts = []
-            if file_type == "docs":
+            if file_type == "pdf":
                 pdf_text = self.extract_text_from_pdf(file_path)  # type: ignore
                 sample_texts = self.chunk_text(pdf_text, chunk_size=50)
 

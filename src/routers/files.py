@@ -19,8 +19,8 @@ async def upload_file(
     current_org=Depends(get_current_org),
 ):
     try:
-        logger.info(f"The data received is: {file_type}")
-        logger.info(f"The data received is: {description}")
+        logger.info(f"The file type received is: {file_type}")
+        logger.info(f"The description received is: {description}")
 
         response = await file_controller.process_embeddings(
             current_org, file, file_type, description

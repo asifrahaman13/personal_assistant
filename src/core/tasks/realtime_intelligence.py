@@ -425,19 +425,24 @@ class RealTimeIntelligenceHandler:
         images: Union[str, List[str], None] = None,
         videos: Union[str, List[str], None] = None,
         audios: Union[str, List[str], None] = None,
+        pdfs: Union[str, List[str], None] = None,
     ) -> bool:
         try:
             if not self.client or not self.client.is_connected():
                 logger.error("Client not connected, cannot send message")
                 return False
 
-            # Helper to normalize into list
             def to_list(f):
                 if not f:
                     return []
                 return [f] if isinstance(f, str) else f
 
-            images, videos, audios = to_list(images), to_list(videos), to_list(audios)
+            images, videos, audios, pdfs = (
+                to_list(images),
+                to_list(videos),
+                to_list(audios),
+                to_list(pdfs),
+            )
 
             sent_any = False
 
@@ -469,6 +474,16 @@ class RealTimeIntelligenceHandler:
                     parse_mode="html",
                 )
                 logger.info(f"Sent {len(audios)} audio(s) to chat {chat_id}")
+                sent_any = True
+
+            if pdfs:
+                await self.client.send_file(
+                    chat_id,
+                    file=pdfs,
+                    caption=response_text if not sent_any else None,  # type: ignore
+                    parse_mode="html",
+                )
+                logger.info(f"Sent {len(pdfs)} pdf(s) to chat {chat_id}")
                 sent_any = True
 
             if not sent_any:
@@ -553,15 +568,17 @@ class RealTimeIntelligenceHandler:
                         logger.info(
                             f"The message does not belong to the session owner. Sending intelligent response to chat {chat_id}: {intelligent_response}"
                         )
-                        image_lists, video_lists, audio_lists = self.extract_media_files(
+                        image_lists, video_lists, audio_lists, pdf_files = self.extract_media_files(
                             search_results
                         )
+
                         await self.send_intelligent_response(
                             chat_id,
                             intelligent_response[0],
                             images=image_lists,
                             videos=video_lists,
                             audios=audio_lists,
+                            pdfs=pdf_files,
                         )
 
                 except Exception as e:
@@ -586,10 +603,11 @@ class RealTimeIntelligenceHandler:
 
     def extract_media_files(
         self, search_results: List[Dict]
-    ) -> Tuple[List[str], List[str], List[str]]:
+    ) -> Tuple[List[str], List[str], List[str], List[str]]:
         image_files: List[str] = []
         video_files: List[str] = []
         audio_files: List[str] = []
+        pdf_files: List[str] = []
 
         for search_result in search_results:
             metadata = search_result.get("metadata")
@@ -608,12 +626,15 @@ class RealTimeIntelligenceHandler:
                 video_files.append(file_path)
             elif file_type == "audio":
                 audio_files.append(file_path)
+            elif file_type == "pdf":
+                pdf_files.append(file_path)
 
         image_files = list(set(image_files))
         video_files = list(set(video_files))
         audio_files = list(set(audio_files))
+        pdf_files = list(set(pdf_files))
 
-        return image_files, video_files, audio_files
+        return image_files, video_files, audio_files, pdf_files
 
     async def handle_new_message(self, event):
         try:
