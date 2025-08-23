@@ -41,7 +41,7 @@ export function TelegramAuth() {
           );
 
           if (response.data) {
-            router.push('/dashboard');
+            router.push('/dashboard/uploads');
             return;
           }
         }
@@ -71,7 +71,7 @@ export function TelegramAuth() {
       if (response.data.success) {
         if (!response.data.requires_code) {
           localStorage.setItem('telegram_phone', phone);
-          router.push('/dashboard');
+          router.push('/dashboard/uploads');
           return;
         }
 
@@ -108,8 +108,8 @@ export function TelegramAuth() {
         setStep('success');
 
         setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000);
+          router.push('/dashboard/uploads');
+        }, 1000);
       } else {
         setError(response.data.message);
         setStep('error');

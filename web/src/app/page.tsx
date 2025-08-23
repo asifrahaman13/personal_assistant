@@ -11,7 +11,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg"></div>
-            <span className="text-xl font-semibold text-gray-900">Personal Assistant</span>
+            <span className="text-xl font-semibold text-gray-900">Persona AI</span>
           </div>
           <Link
             href="/organization"
@@ -31,10 +31,10 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              AI Based
+              AI Powered
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {' '}
-                Personal{' '}
+                Salesman{' '}
               </span>
               Assistant
             </h1>
@@ -49,7 +49,7 @@ export default function Home() {
                 href="/organization"
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center space-x-2"
               >
-                <span>Start Analyzing</span>
+                <span>Enable AI salesman</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"

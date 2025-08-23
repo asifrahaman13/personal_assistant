@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <div>
                 <Link href="/" className="text-2xl font-bold text-gray-900">
-                  Personal Assistant
+                  Persona AI
                 </Link>
                 <p className="text-gray-600">Dashboard</p>
               </div>
