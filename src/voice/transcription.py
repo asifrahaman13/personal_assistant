@@ -14,6 +14,8 @@ from src.logs.logs import logger
 class DeepgramTranscription:
     def __init__(self) -> None:
         self.api_key = config.DEEPGRAM_API_KEY
+        self.model = "nova-3"
+        self.smart_format = True
 
     async def transcribe(self, file_path: str) -> str:
         try:
@@ -27,11 +29,9 @@ class DeepgramTranscription:
             }
 
             options = PrerecordedOptions(
-                model="nova-3",
-                smart_format=True,
+                model=self.model,
+                smart_format=self.smart_format,
             )
-
-            # Assuming the SDK supports async, otherwise use run_in_executor
             response = await deepgram.listen.rest.v("1").transcribe_file(payload, options)  # type: ignore
             response_dict = json.loads(response.to_json())  # type: ignore
             transcript = response_dict["results"]["channels"][0]["alternatives"][0]["transcript"]

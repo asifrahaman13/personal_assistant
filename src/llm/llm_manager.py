@@ -1,6 +1,8 @@
+import base64
 from enum import Enum
 import re
 
+import aiofiles
 import openai
 
 from src.config.config import config
@@ -90,9 +92,7 @@ class LLMManager:
                     },
                     {"role": "user", "content": prompt},
                 ],
-                # max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                # top_p=self.top_p,
             )
 
             result = (
@@ -107,4 +107,41 @@ class LLMManager:
             return cleaned
         except Exception as e:
             logger.error(f"Error in LLM response generation: {str(e)}")
+            return ""
+
+    async def image_descriptor(self, image_base64: str) -> str:
+        try:
+            if not self.client:
+                logger.error("OpenAI client not initialized")
+                return ""
+
+            prompt = "Describe the contents of this image in detail."
+
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{image_base64}",
+                                },
+                            },
+                        ],
+                    }
+                ],
+            )
+
+            result = (
+                response.choices[0].message.content.strip()
+                if response.choices[0].message.content
+                else ""
+            )
+            logger.info(f"Image description: {result}")
+            return result
+        except Exception as e:
+            logger.error(f"Error in image description: {str(e)}")
             return ""
