@@ -45,12 +45,15 @@ satisfaction scores by up to 25% and can increase conversion rates by 2–3x.
 
 ### Telegram auto reply as an AI AI-powered second brain. Capable of giving text as well as multimedia responses.
 
-<img width="378" height="765" alt="Screenshot from 2025-08-21 10-18-14" src="https://github.com/user-attachments/assets/ed6eb565-173a-4353-9178-0db06279dac5" />
-<img width="378" height="765" alt="Screenshot from 2025-08-21 10-18-51" src="https://github.com/user-attachments/assets/8bcc5f11-ae0f-4d49-89f2-451abd6f676b" />
-<img width="378" height="765" alt="Screenshot from 2025-08-21 10-19-20" src="https://github.com/user-attachments/assets/6e1a96b1-734b-4860-af73-00202e4ad12f" />
+<img width="722" height="260" alt="Screenshot from 2025-08-24 19-43-06" src="https://github.com/user-attachments/assets/dcd4cafe-482c-4398-bf30-9c6ad000bd60" />
+<img width="742" height="731" alt="Screenshot from 2025-08-24 19-43-39" src="https://github.com/user-attachments/assets/69b58399-8071-408c-8e46-a249594df632" />
+<img width="742" height="731" alt="Screenshot from 2025-08-24 19-44-08" src="https://github.com/user-attachments/assets/65eeac97-deb5-4a48-81a0-9a01fe666de5" />
+<img width="790" height="605" alt="Screenshot from 2025-08-24 19-44-25" src="https://github.com/user-attachments/assets/4f6c08f6-1677-4f8e-b574-3b738b0e1252" />
+
 
 ### Email-based auto response. 
 
+<img width="1530" height="844" alt="Screenshot from 2025-08-24 19-45-33" src="https://github.com/user-attachments/assets/29e579d6-c783-406f-adac-c026a689ba46" />
 <img width="1526" height="810" alt="Screenshot from 2025-08-23 10-20-41" src="https://github.com/user-attachments/assets/013744f1-c940-47a8-9cfa-775ed1e3642b" />
 <img width="1580" height="786" alt="Screenshot from 2025-08-23 10-22-32" src="https://github.com/user-attachments/assets/7b23811d-f07b-4a33-84e2-716948e7094a" />
 <img width="1590" height="644" alt="Screenshot from 2025-08-21 10-21-57" src="https://github.com/user-attachments/assets/474c3d9c-399b-461c-8b89-f599520a3167" />
@@ -62,7 +65,7 @@ satisfaction scores by up to 25% and can increase conversion rates by 2–3x.
 
 ## 🏯 Architecture
 
-A high level architecture of the application can bed described using the following image:
+A high-level architecture of the application can be described using the following image:
 
 <img width="1230" height="635" alt="Screenshot from 2025-08-23 16-27-37" src="https://github.com/user-attachments/assets/577bf740-c5b3-44ff-8cd9-6b17c13bb712" />
 
