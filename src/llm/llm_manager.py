@@ -14,6 +14,7 @@ class Model(Enum):
     GPT_5 = "gpt-5"
     GPT_5_CHAT = "gpt-5-chat"
     GOOGLE_GEMMA_3N = "google/gemma-3n-e4b-it"
+    GPT_5_CHAT_AI_ML_API = "openai/gpt-5-chat-latest"
 
 
 class Service(Enum):
@@ -52,14 +53,14 @@ class LLMManager:
         if config.SERVICE == Service.OPENAI_API.value:
             self.api_key = config.OPENAI_API_KEY
             self.client = openai.AsyncOpenAI(api_key=self.api_key)
-            self.model = Model.GPT_4_1.value
+            self.model = Model.GPT_5.value
 
         elif config.SERVICE == Service.AI_ML_API.value:
             self.ai_ml_api_key = config.AI_ML_API_KEY
             self.client = openai.AsyncOpenAI(
                 base_url="https://api.aimlapi.com/v1", api_key=self.ai_ml_api_key
             )
-            self.model = Model.GPT_5.value
+            self.model = Model.GPT_5_CHAT_AI_ML_API.value
         self.max_tokens = 500
         self.top_p = 0.1
         self.temperature = 1
