@@ -1,6 +1,7 @@
 ## AI POWERED SECOND BRAIN
 
 
+
 ## Short description
 
 A production-ready, Personalized AI-powered second brain assistant. Capable of responding to the users ' queries they have regarding the companies.
@@ -25,8 +26,9 @@ consistent, brand-aligned communication across all channels.
 - By offering personalized, trust-building interactions at scale, it boosts customer 
 satisfaction scores by up to 25% and can increase conversion rates by 2–3x.
 
+<img width="1024" height="1536" alt="ChatGPT Image Aug 24, 2025, 03_36_08 PM" src="https://github.com/user-attachments/assets/db0b661f-2fa3-4d21-8651-11420cfd858e" />
 
-#### General description
+#### Pivots
 
 - In industries such as real estate, healthcare, financial services, and technology, customers often have countless questions and uncertainties before making a purchase or engaging with a company’s offerings. Addressing these queries typically requires significant human resources, time, and financial investment, with organizations spending millions on sales teams, customer support, and pre-sales engagement.
 
