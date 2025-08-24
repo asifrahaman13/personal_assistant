@@ -32,7 +32,7 @@ class DeepgramTranscription:
                 model=self.model,
                 smart_format=self.smart_format,
             )
-            response = await deepgram.listen.rest.v("1").transcribe_file(payload, options)  # type: ignore
+            response = deepgram.listen.rest.v("1").transcribe_file(payload, options)  # type: ignore
             response_dict = json.loads(response.to_json())  # type: ignore
             transcript = response_dict["results"]["channels"][0]["alternatives"][0]["transcript"]
             logger.info(f"The transcript is: {transcript}")
