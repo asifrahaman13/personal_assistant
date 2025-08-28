@@ -1,7 +1,6 @@
 ## AI POWERED SECOND BRAIN
 
 
-
 ## Short description
 
 A production-ready, Personalized AI-powered second brain assistant. Capable of responding to the users ' queries they have regarding the companies.
