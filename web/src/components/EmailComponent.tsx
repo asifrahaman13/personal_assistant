@@ -122,7 +122,17 @@ const EmailComponent = () => {
   return (
     <React.Fragment>
       <div className="">
-        <div className=" text-xl font-bold   max-w-8xl ">GMAIL</div>
+        <div className="flex items-center gap-6">
+          <div className=" text-xl font-bold max-w-8xl ">GMAIL</div>
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=asifrahaman137@gmail.com&su=Query%20regarding%20real%20estates&body=Can%20you%20give%20information%20on%20the%20real%20estate%20available%20in%20Mumbai%3F"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-5 py-3 bg-[#0088cc] text-white font-semibold rounded-xl shadow-md hover:bg-[#006f9e] hover:shadow-lg transform hover:-translate-y-0.5 transition"
+          >
+            📧 Email here (after clicking Start process)
+          </a>
+        </div>
 
         {/* Main Content */}
         <main className="max-w-8xl  py-8">

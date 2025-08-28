@@ -123,7 +123,17 @@ const TelegramComponent = () => {
     <React.Fragment>
       {/* Group Selector */}
       <div className="">
-        <div className=" text-xl font-bold max-w-8xl ">TELEGRAM</div>
+        <div className='flex items-center gap-6'>
+          <div className=" text-xl font-bold max-w-8xl ">TELEGRAM</div>
+          <a
+            href="https://t.me/Nonearif"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-5 py-3 bg-[#0088cc] text-white font-semibold rounded-xl shadow-md hover:bg-[#006f9e] hover:shadow-lg transform hover:-translate-y-0.5 transition"
+          >
+            💬 Message @Nonearif on Telegram (after clicking Start process)
+          </a>
+        </div>
 
         {/* Main Content */}
         <main className="max-w-8xl py-8">

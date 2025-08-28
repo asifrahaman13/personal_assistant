@@ -309,7 +309,7 @@ export default function OrganizationAuthPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Enter the email: asifrahaman137@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
@@ -321,7 +321,7 @@ export default function OrganizationAuthPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your password: asif"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
