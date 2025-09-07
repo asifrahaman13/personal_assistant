@@ -29,6 +29,7 @@ dependencies = [
     "pillow>=11.3.0",
     "deepgram-sdk>=4.8.1",
     "pytest-asyncio>=1.1.0",
+    "pytest>=8.4.1",
 ]
 requires-python = ">=3.12"
 
@@ -40,7 +41,8 @@ build-backend = "hatchling.build"
 packages = ["src"]
 
 [tool.ruff]
-lint.select = ["I"]             # Only enable import sorting (isort rules)
+# Only enable import sorting (isort rules)
+lint.select = ["I"]
 lint.ignore = []                
 lint.fixable = ["ALL"]          
 

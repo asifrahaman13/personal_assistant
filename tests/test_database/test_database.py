@@ -1,6 +1,7 @@
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
 import pytest_asyncio
-from unittest.mock import Mock, AsyncMock, patch
 
 from src.db.mongodb import MongoDBManager
 
