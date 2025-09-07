@@ -2,7 +2,6 @@ import asyncio
 import base64
 from pathlib import Path
 import re
-import shutil
 from typing import Any, Dict, Optional
 
 import aiofiles

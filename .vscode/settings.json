@@ -1,8 +1,20 @@
 {
-  "files.exclude": {
-    "**/build": true,
-    "**/temp": true,
-    ".ruff_cache": true,
-    ".mypy_cache": true,
-  }
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "files.exclude": {
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/.pytest_cache": true,
+        "**/.coverage": true,
+        "**/htmlcov": true,
+        "**/.tox": true,
+        "**/.venv": true,
+        "**/venv": true,
+        "**/.env": true,
+        "**/.env.local": true,
+        "**/.env.*.local": true,
+        "**/node_modules": true,
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    }
 }
